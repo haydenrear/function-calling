@@ -1,0 +1,49 @@
+
+spring.application.name: function-calling
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: function-calling/src/main/docker/docker-compose.yml
+      lifecycle-management: start_only
+      readiness:
+        wait: never
+      skip:
+        in-tests: false
+  jpa:
+    hibernate:
+      ddl-auto: create
+      format_sql: true
+    show-sql: true
+    database: postgresql
+  datasource:
+    url: jdbc:postgresql://localhost:5440/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: postgres
+      jdbc-url: jdbc:postgresql://localhost:5440/postgres
+  liquibase:
+    enabled: false
+  cloud:
+    zookeeper:
+      discovery:
+        enabled: false
+      enabled: false
+
+model-server:
+  models:
+    - name: vertex-ai
+      dimensions: 4096
+
+logging.config: classpath:logback.xml
+logging:
+  level:
+    org.springframework.boot: INFO
+
+endpoints:
+  zookeeper:
+    enabled: false
