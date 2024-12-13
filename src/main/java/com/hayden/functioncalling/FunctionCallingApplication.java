@@ -2,6 +2,7 @@ package com.hayden.functioncalling;
 
 import com.hayden.utilitymodule.ctx.PresetProperties;
 import org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.otlp.OtlpMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

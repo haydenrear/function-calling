@@ -6,13 +6,17 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.model.function.FunctionCallbackContext;
+import org.springframework.ai.model.function.FunctionCallingHelper;
 import org.springframework.ai.model.function.FunctionCallingOptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class ModelServerFunctionCallingModel extends AbstractToolCallSupport implements org.springframework.ai.chat.model.ChatModel {
+
 
     public ModelServerFunctionCallingModel() {
         super(new FunctionCallbackContext());
@@ -22,7 +26,9 @@ public class ModelServerFunctionCallingModel extends AbstractToolCallSupport imp
         super(functionCallbackContext);
     }
 
-    protected ModelServerFunctionCallingModel(FunctionCallbackContext functionCallbackContext, FunctionCallingOptions functionCallingOptions, List<FunctionCallback> toolFunctionCallbacks) {
+    protected ModelServerFunctionCallingModel(FunctionCallbackContext functionCallbackContext,
+                                              FunctionCallingOptions functionCallingOptions,
+                                              List<FunctionCallback> toolFunctionCallbacks) {
         super(functionCallbackContext, functionCallingOptions, toolFunctionCallbacks);
     }
 

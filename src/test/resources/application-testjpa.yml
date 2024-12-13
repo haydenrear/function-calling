@@ -23,3 +23,8 @@ spring:
     url: jdbc:postgresql://localhost:5440/postgres
   liquibase:
     enabled: false
+
+model-server:
+  models:
+    - name: gen-ai
+      dimensions: 4096

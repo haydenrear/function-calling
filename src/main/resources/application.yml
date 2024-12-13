@@ -4,7 +4,7 @@ spring:
   docker:
     compose:
       enabled: true
-      file: function-calling/src/main/docker/docker-compose.yml
+      file: src/main/docker/docker-compose.yml
       lifecycle-management: start_only
       readiness:
         wait: never
@@ -34,10 +34,10 @@ spring:
         enabled: false
       enabled: false
 
-model-server:
-  models:
-    - name: vertex-ai
-      dimensions: 4096
+#model-server:
+#  models:
+#    - name: gen-ai
+#      dimensions: 4096
 
 logging.config: classpath:logback.xml
 logging:

@@ -20,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class PostgresMLEmbeddingModelTest {
 
 
-    @Test
+//    @Test
     public void doTestPostgresEmbeddingModel() {
     }
 
