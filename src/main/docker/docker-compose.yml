@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - function-calling:/var/lib/postgresql/data
+      - function-calling:/var/lib/postgresql/embedding
     ports:
       - "5440:5432"
 volumes:
