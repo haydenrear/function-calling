@@ -6,11 +6,15 @@ import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.model.function.FunctionCallbackContext;
 import org.springframework.ai.model.function.FunctionCallingHelper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.function.Function;
 
 @Configuration
+@ComponentScan(basePackages = {
+        "com.hayden.commitdiffmodel",
+        "com.hayden.proto"})
 public class FunctionConfig {
 
     @Bean

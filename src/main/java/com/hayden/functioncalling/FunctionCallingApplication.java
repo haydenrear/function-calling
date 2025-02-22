@@ -9,7 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(exclude = {VertexAiGeminiAutoConfiguration.class, OtlpMetricsExportAutoConfiguration.class})
+@SpringBootApplication(exclude = {
+        VertexAiGeminiAutoConfiguration.class, OtlpMetricsExportAutoConfiguration.class})
 @Import(PresetProperties.class)
 public class FunctionCallingApplication {
 

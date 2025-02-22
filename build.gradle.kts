@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":proto"))
     implementation(project(":utilitymodule"))
     implementation(project(":tracing"))
+    implementation(project(":commit-diff-model"))
 }
 
 dependencyManagement {

@@ -1,5 +1,8 @@
 package com.hayden.functioncalling.model_server;
 
+import com.hayden.proto.prototyped.datasources.ai.modelserver.client.ModelServerCodingAiClient;
+import com.hayden.proto.prototyped.datasources.ai.modelserver.client.ModelServerEmbeddingAiClient;
+import com.hayden.proto.prototyped.datasources.ai.modelserver.request.ModelServerChatRequest;
 import org.springframework.ai.chat.model.AbstractToolCallSupport;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -17,6 +20,8 @@ import java.util.List;
 @Component
 public class ModelServerFunctionCallingModel extends AbstractToolCallSupport implements org.springframework.ai.chat.model.ChatModel {
 
+    @Autowired
+    private ModelServerCodingAiClient codingAiClient;
 
     public ModelServerFunctionCallingModel() {
         super(new FunctionCallbackContext());

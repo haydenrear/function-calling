@@ -39,6 +39,9 @@ spring:
 #    - name: gen-ai
 #      dimensions: 4096
 
+  commit-diff-context:
+
+
 logging.config: classpath:logback.xml
 logging:
   level:
