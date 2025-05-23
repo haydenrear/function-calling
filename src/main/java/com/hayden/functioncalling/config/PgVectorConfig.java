@@ -1,7 +1,6 @@
 package com.hayden.functioncalling.config;
 
-import com.hayden.functioncalling.model_server.ModelServerEmbeddingModel;
-import lombok.SneakyThrows;
+import com.hayden.commitdiffmodel.message.ModelServerEmbeddingModel;
 import org.springframework.ai.vectorstore.PgVectorStore;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.annotation.Bean;
