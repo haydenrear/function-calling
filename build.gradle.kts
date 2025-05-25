@@ -4,26 +4,28 @@ plugins {
     id("com.hayden.graphql-data-service")
     id("com.hayden.discovery-app")
     id("com.hayden.messaging")
+    id("com.hayden.ai")
     id("com.hayden.docker-compose")
 }
 
 group = "com.hayden"
 version = "0.0.1-SNAPSHOT"
 
-extra["springAiVersion"] = "1.0.0-M4"
+tasks.register("prepareKotlinBuildScriptModel") {}
 
 dependencies {
+    implementation("org.modelmapper:modelmapper:3.0.0")
     implementation(project(":proto"))
     implementation(project(":utilitymodule"))
     implementation(project(":tracing"))
     implementation(project(":commit-diff-model"))
+    implementation(project(":jpa-persistence"))
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}")
-    }
+
+tasks.generateJava {
+    typeMapping = mutableMapOf(
+        Pair("ServerByteArray", "com.hayden.commitdiffmodel.scalar.ByteArray"),
+        Pair("Float32Array", "com.hayden.commitdiffmodel.scalar.FloatArray"),
+    )
 }
-
-tasks.register("prepareKotlinBuildScriptModel")
-

@@ -1,0 +1,13 @@
+services:
+  function-calling-postgres:
+    image: localhost:5001/postgres-pgvector
+    container_name: function-calling-postgres-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - function-calling-test:/var/lib/postgresql/embedding
+    ports:
+      - "5467:5432"
+volumes:
+  function-calling-test:

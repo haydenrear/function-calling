@@ -1,0 +1,32 @@
+logging.config: classpath:logback.xml
+
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: src/test/docker/docker-compose.yml
+      lifecycle-management: start_only
+      readiness:
+        wait: always
+      skip:
+        in-tests: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      format_sql: true
+    show-sql: false
+  datasource:
+    url: jdbc:postgresql://localhost:5467/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: postgres
+      jdbc-url: jdbc:postgresql://localhost:5467/postgres
+  liquibase:
+    enabled: false
+  cloud:
+    zookeeper:
+      enabled: false

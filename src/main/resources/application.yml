@@ -34,12 +34,25 @@ spring:
         enabled: false
       enabled: false
 
-#model-server:
-#  models:
-#    - name: gen-ai
-#      dimensions: 4096
-
-  commit-diff-context:
+code-runner:
+  registrations:
+    - id: "echo"
+      command: "echo"
+      description: "Simple echo command"
+      arguments: "Hello, World!"
+      timeoutSeconds: 30
+      enabled: true
+    - id: "ls"
+      command: "ls"
+      description: "List directory contents"
+      arguments: "-la"
+      timeoutSeconds: 30
+      enabled: true
+    - id: "pwd"
+      command: "pwd"
+      description: "Print working directory"
+      timeoutSeconds: 15
+      enabled: true
 
 
 logging.config: classpath:logback.xml

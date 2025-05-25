@@ -1,26 +1,19 @@
 package com.hayden.functioncalling.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hayden.functioncalling.model.GraphQlPreRegisteredRequest;
-import org.springframework.ai.model.function.FunctionCallback;
-import org.springframework.ai.model.function.FunctionCallbackContext;
-import org.springframework.ai.model.function.FunctionCallingHelper;
-import org.springframework.context.annotation.Bean;
+import com.hayden.persistence.config.JpaConfig;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.function.Function;
+import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
 @ComponentScan(basePackages = {
-        "com.hayden.commitdiffmodel",
-        "com.hayden.proto"})
+        "com.hayden.commitdiffmodel.codegen",
+        "com.hayden.commitdiffmodel.scalar"})
+@Import({JpaConfig.class})
+@EnableAsync
 public class FunctionConfig {
 
-    @Bean
-    public FunctionCallingHelper functionCallingHelper() {
-        return new FunctionCallingHelper();
-    }
 
     /**
      * TODO: Note to self, there should definitely be some sort of circuit breaker here...
@@ -31,13 +24,13 @@ public class FunctionConfig {
      * @param om
      * @return
      */
-//    @Bean
-    public FunctionCallback graphQlFunctionCallback(ObjectMapper om) {
-        return FunctionCallback.builder()
-                .objectMapper(om)
-                .function("", a -> {})
-                .inputType(GraphQlPreRegisteredRequest.class)
-                .build();
-    }
+////    @Bean
+//    public FunctionCallback graphQlFunctionCallback(ObjectMapper om) {
+//        return FunctionCallback.builder()
+//                .objectMapper(om)
+//                .function("", a -> {})
+//                .inputType(GraphQlPreRegisteredRequest.class)
+//                .build();
+//    }
 
 }
