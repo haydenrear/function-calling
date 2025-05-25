@@ -32,7 +32,7 @@ public class CodeRunnerConfigProps {
         private String workingDirectory;
         private String description;
         private String arguments;
-        private Integer timeoutSeconds = 60;
+        private Integer timeoutSeconds = -1;
         private boolean enabled = true;
         private List<Path> reportingPaths = new ArrayList<>();
         private List<String> outputRegex = new ArrayList<>();

@@ -207,6 +207,15 @@ public class ProcessBuilderExecRunnerTest {
         assertThat(result.getExitCode()).isNotEqualTo(0);
     }
 
+//    @Test
+//    void testRunAll() {
+//        CodeExecutionOptions options = CodeExecutionOptions.newBuilder()
+//                .registrationId("run-test-graph-all")
+//                .build();
+//        var ran = execRunner.run(options);
+//        System.out.println();
+//    }
+
     @Test
     void testRunWithNullRegistrationId() {
         CodeExecutionOptions options = CodeExecutionOptions.newBuilder()

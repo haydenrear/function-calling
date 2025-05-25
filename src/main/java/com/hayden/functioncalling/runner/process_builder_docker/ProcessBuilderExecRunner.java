@@ -179,7 +179,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         
         // Wait for the output thread to finish reading
         try {
-            out.get(1000, TimeUnit.MILLISECONDS); // Wait up to 1 second for the thread to finish
+            out.get(100000, TimeUnit.MILLISECONDS); // Wait up to 1 second for the thread to finish
         } catch (InterruptedException |
                  ExecutionException |
                  TimeoutException e) {

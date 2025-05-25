@@ -29,10 +29,6 @@ public class TestReportService {
             return null;
         }
 
-        if (path.toFile().isFile()) {
-            path = path.getParent();
-        }
-
         return testResultsProcessor.processTestFailures(path.toFile().getAbsolutePath());
     }
 }

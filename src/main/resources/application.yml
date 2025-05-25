@@ -60,13 +60,12 @@ code-runner:
       description: "Test CDC agents"
       enabled: true
     - id: "run-test-graph-all"
-      command: "all-test-test-graph.sh"
+      command: "/bin/zsh"
+      arguments: "all-tests-test-graph.sh"
       working-directory: "/Users/hayde/IdeaProjects/drools"
       description: "Run pipeline for all"
-      output-regex:
-        -
       reporting-paths:
-        - file:///Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test
+        - file:///Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test/index.html
 
 
 logging.config: classpath:logback.xml
