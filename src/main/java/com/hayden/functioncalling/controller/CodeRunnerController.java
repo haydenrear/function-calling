@@ -48,8 +48,8 @@ public class CodeRunnerController {
     }
 
     @DgsQuery
-    public CodeExecutionRegistration getCodeExecutionRegistration(@InputArgument String id) {
-        Optional<CodeExecutionEntity> entity = executionRepository.findByRegistrationId(id);
+    public CodeExecutionRegistration getCodeExecutionRegistration(@InputArgument String registrationId) {
+        Optional<CodeExecutionEntity> entity = executionRepository.findByRegistrationId(registrationId);
         return entity.map(this::mapToRegistration).orElse(null);
     }
 
@@ -68,16 +68,16 @@ public class CodeRunnerController {
     @DgsMutation
     @Transactional
     public CodeExecutionRegistration updateCodeExecutionRegistration(
-            @InputArgument String id,
+            @InputArgument String registrationId,
             @InputArgument Boolean enabled,
             @InputArgument String command,
             @InputArgument String workingDirectory,
             @InputArgument String arguments,
             @InputArgument Integer timeoutSeconds) {
         
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(id);
+        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
-            log.warn("Cannot update - no code execution registration found with ID: {}", id);
+            log.warn("Cannot update - no code execution registration found with ID: {}", registrationId);
             return null;
         }
         
@@ -111,15 +111,15 @@ public class CodeRunnerController {
 
     @DgsMutation
     @Transactional
-    public Boolean deleteCodeExecutionRegistration(@InputArgument String id) {
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(id);
+    public Boolean deleteCodeExecutionRegistration(@InputArgument String registrationId) {
+        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
-            log.warn("Cannot delete - no code execution registration found with ID: {}", id);
+            log.warn("Cannot delete - no code execution registration found with ID: {}", registrationId);
             return false;
         }
         
         executionRepository.delete(entityOpt.get());
-        log.info("Deleted code execution registration: {}", id);
+        log.info("Deleted code execution registration: {}", registrationId);
         
         return true;
     }
@@ -175,7 +175,7 @@ public class CodeRunnerController {
     
     private CodeExecution mapToExecution(CodeExecutionHistory entity) {
         return CodeExecution.newBuilder()
-                .id(entity.getExecutionId())
+                .registrationId(entity.getExecutionId())
                 .command(entity.getCommand() + (entity.getArguments() != null ? " " + entity.getArguments() : ""))
                 .status(entity.getSuccess() ? "SUCCESS" : "FAILED")
                 .startTime(convertToDate(entity.getExecutionTimeMs()))
@@ -185,7 +185,7 @@ public class CodeRunnerController {
                          : null)
                 .exitCode(entity.getExitCode())
                 .output(entity.getOutput())
-                .error(entity.getError())
+                .error(List.of(new Error(entity.getError())))
                 .build();
     }
 

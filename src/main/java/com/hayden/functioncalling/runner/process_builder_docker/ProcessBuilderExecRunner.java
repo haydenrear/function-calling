@@ -69,6 +69,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         if (!executionEntity.getEnabled()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
+                    .registrationId(options.getRegistrationId())
                     .error(List.of(new Error("Code execution registration is disabled: " + options.getRegistrationId())))
                     .build();
         }
@@ -79,6 +80,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
             log.error("Error executing command", e);
             return CodeExecutionResult.newBuilder()
                     .success(false)
+                    .registrationId(options.getRegistrationId())
                     .error(List.of(new Error("Error executing command: " + e.getMessage())))
                     .build();
         }
@@ -233,6 +235,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
                 outputStr, error, success, exitCode, executionTimeMs);
 
         return CodeExecutionResult.newBuilder()
+                .registrationId(options.getRegistrationId())
                 .success(success)
                 .output(output.toString())
                 .exitCode(exitCode)
