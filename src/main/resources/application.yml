@@ -36,23 +36,6 @@ spring:
 
 code-runner:
   registrations:
-    - id: "echo"
-      command: "echo"
-      description: "Simple echo command"
-      arguments: "Hello, World!"
-      timeoutSeconds: 30
-      enabled: true
-    - id: "ls"
-      command: "ls"
-      description: "List directory contents"
-      arguments: "-la"
-      timeoutSeconds: 30
-      enabled: true
-    - id: "pwd"
-      command: "pwd"
-      description: "Print working directory"
-      timeoutSeconds: 15
-      enabled: true
     - id: "cdc-agents-test"
       command: "uv"
       working-directory: "/Users/hayde/IdeaProjects/drools/python_parent/packages/cdc_agents"
@@ -60,10 +43,11 @@ code-runner:
       description: "Test CDC agents"
       enabled: true
     - id: "run-test-graph-all"
+      enabled: true
       command: "/bin/zsh"
       arguments: "all-tests-test-graph.sh"
       working-directory: "/Users/hayde/IdeaProjects/drools"
-      description: "Run pipeline for all"
+      description: "Run pipeline for testing commit diff context in unit tests and integration tests in the test graph"
       reporting-paths:
         - file:///Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test/index.html
         - file:///Users/hayde/IdeaProjects/drools/test_graph/build/test-report-log.log
