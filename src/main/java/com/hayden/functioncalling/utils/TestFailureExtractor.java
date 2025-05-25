@@ -35,7 +35,7 @@ public class TestFailureExtractor {
     public Map<String, List<FailureDetail>> extractFailures() {
         Map<String, List<FailureDetail>> failures = new HashMap<>();
 
-        if (testReportDir.endsWith("txt")) {
+        if (testReportDir.endsWith("log") || testReportDir.endsWith("txt")) {
             try {
                 return Map.of(testReportDir, Lists.newArrayList(new FailureDetail(testReportDir, Files.readString(Paths.get(testReportDir))))) ;
             } catch (IOException e) {

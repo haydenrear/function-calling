@@ -66,6 +66,8 @@ code-runner:
       description: "Run pipeline for all"
       reporting-paths:
         - file:///Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test/index.html
+        - file:///Users/hayde/IdeaProjects/drools/test_graph/build/test-report-log.log
+        - file:///Users/hayde/IdeaProjects/drools/test_graph/build/reports/tests/test/index.html
 
 
 logging.config: classpath:logback.xml
