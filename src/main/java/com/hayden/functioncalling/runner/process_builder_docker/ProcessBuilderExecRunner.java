@@ -2,6 +2,7 @@ package com.hayden.functioncalling.runner.process_builder_docker;
 
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionOptions;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionResult;
+import com.hayden.commitdiffmodel.codegen.types.Error;
 import com.hayden.functioncalling.entity.CodeExecutionEntity;
 import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
 import com.hayden.functioncalling.repository.CodeExecutionRepository;
@@ -50,7 +51,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         if (options.getRegistrationId() == null) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("Registration ID is required")
+                    .error(List.of(new Error("Registration ID is required")))
                     .build();
         }
         
@@ -59,7 +60,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         if (executionEntityOpt.isEmpty()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("No code execution registration found with ID: " + options.getRegistrationId())
+                    .error(List.of(new Error("No code execution registration found with ID: " + options.getRegistrationId())))
                     .build();
         }
         
@@ -68,7 +69,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         if (!executionEntity.getEnabled()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("Code execution registration is disabled: " + options.getRegistrationId())
+                    .error(List.of(new Error("Code execution registration is disabled: " + options.getRegistrationId())))
                     .build();
         }
         
@@ -78,7 +79,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
             log.error("Error executing command", e);
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("Error executing command: " + e.getMessage())
+                    .error(List.of(new Error("Error executing command: " + e.getMessage())))
                     .build();
         }
     }
@@ -179,7 +180,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         
         // Wait for the output thread to finish reading
         try {
-            out.get(100000, TimeUnit.MILLISECONDS); // Wait up to 1 second for the thread to finish
+            out.get(1, TimeUnit.MILLISECONDS); // Wait up to 1 second for the thread to finish
         } catch (InterruptedException |
                  ExecutionException |
                  TimeoutException e) {
@@ -237,7 +238,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
                 .exitCode(exitCode)
                 .executionTime(executionTimeMs)
                 .executionId(executionId)
-                .error(error)
+                .error(List.of(new Error(error)))
                 .outputFile(writeToFile ? outputFilePath : null)
                 .build();
     }

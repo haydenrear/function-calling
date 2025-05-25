@@ -90,7 +90,7 @@ public class ProcessBuilderExecRunnerTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();
-        assertThat(result.getError()).contains("No code execution registration found with ID");
+        assertThat(result.getError().getFirst().getMessage()).contains("No code execution registration found with ID");
     }
 
     @SneakyThrows
@@ -112,7 +112,7 @@ public class ProcessBuilderExecRunnerTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();
-        assertThat(result.getError()).contains("Code execution registration is disabled");
+        assertThat(result.getError().getFirst().getMessage()).contains("Code execution registration is disabled");
 
     }
 
@@ -182,7 +182,7 @@ public class ProcessBuilderExecRunnerTest {
         
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();
-        assertThat(result.getError()).contains("timed out");
+        assertThat(result.getError().getFirst().getMessage()).contains("timed out");
     }
 
     @Test
@@ -225,6 +225,6 @@ public class ProcessBuilderExecRunnerTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();
-        assertThat(result.getError()).contains("Registration ID is required");
+        assertThat(result.getError().getFirst().getMessage()).contains("Registration ID is required");
     }
 }

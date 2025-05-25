@@ -1,6 +1,7 @@
 package com.hayden.functioncalling.controller;
 
 import com.hayden.commitdiffmodel.codegen.types.*;
+import com.hayden.commitdiffmodel.codegen.types.Error;
 import com.hayden.commitdiffmodel.convert.CommitDiffContextMapper;
 import com.hayden.functioncalling.entity.CodeExecutionEntity;
 import com.hayden.functioncalling.entity.CodeExecutionHistory;
@@ -130,7 +131,7 @@ public class CodeRunnerController {
         if (options == null || options.getRegistrationId() == null) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("Invalid execution options. Registration ID is required.")
+                    .error(List.of(new Error("Invalid execution options. Registration ID is required.")))
                     .build();
         }
         
@@ -144,7 +145,7 @@ public class CodeRunnerController {
         if (options == null || options.getRegistrationId() == null) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("Invalid execution options. Registration ID is required.")
+                    .error(List.of(new Error("Invalid execution options. Registration ID is required.")))
                     .build();
         }
         
@@ -204,7 +205,7 @@ public class CodeRunnerController {
         if (executionId == null || executionId.isBlank()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("Execution ID is required")
+                    .error(List.of(new Error("Execution ID is required")))
                     .build();
         }
         
@@ -214,7 +215,7 @@ public class CodeRunnerController {
         if (historyOpt.isEmpty()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
-                    .error("No execution found with ID: " + executionId)
+                    .error(List.of(new Error("No execution found with ID: " + executionId)))
                     .build();
         }
         
@@ -223,7 +224,7 @@ public class CodeRunnerController {
         return CodeExecutionResult.newBuilder()
                 .success(history.getSuccess())
                 .output(history.getOutput())
-                .error(history.getError())
+                .error(List.of(new Error(history.getError())))
                 .exitCode(history.getExitCode())
                 .executionId(executionId)
                 .executionTime(history.getExecutionTimeMs())
