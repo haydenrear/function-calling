@@ -33,10 +33,11 @@ public class ProcessBuilderExecRunner implements ExecRunner {
     private final CodeExecutionRepository codeExecutionRepository;
     private final ExecutionDataService executionDataService;
     private final ThreadPoolTaskExecutor runnerTaskExecutor;
+    private final ThreadPoolTaskExecutor asyncRunnerTaskExecutor;
 
     @Override
     public CompletableFuture<CodeExecutionResult> runAsync(CodeExecutionOptions codeExecutionResult) {
-        return runnerTaskExecutor.submitCompletable(() -> this.run(codeExecutionResult));
+        return asyncRunnerTaskExecutor.submitCompletable(() -> this.run(codeExecutionResult));
     }
 
     @Override
