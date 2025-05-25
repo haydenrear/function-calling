@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":tracing"))
     implementation(project(":commit-diff-model"))
     implementation(project(":jpa-persistence"))
+    implementation("org.jsoup:jsoup:1.15.3")
 }
 
 

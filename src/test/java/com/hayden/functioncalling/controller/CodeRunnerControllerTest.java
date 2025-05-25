@@ -44,6 +44,7 @@ public class CodeRunnerControllerTest {
     private ExecRunner execRunner;
 
     private String registrationId;
+    private String cdcAgentsTest;
 
     @BeforeEach
     void setUp() {
@@ -74,7 +75,27 @@ public class CodeRunnerControllerTest {
                 .build();
 
         historyRepository.save(history);
+
+        cdcAgentsTest = UUID.randomUUID().toString();
+        CodeExecutionEntity runCdcAgentsDockerTest = CodeExecutionEntity.builder()
+                .registrationId(cdcAgentsTest)
+                .command("uv")
+                .arguments("run test-cdc-agents")
+                .workingDirectory("/Users/hayde/IdeaProjects/drools/python_parent/packages/cdc_agents")
+                .enabled(true)
+                .description("Test command")
+                .build();
+
+        executionRepository.save(runCdcAgentsDockerTest);
+
     }
+
+//    @Test
+//    void runCdcAgentsTest() {
+//        var found = execRunner.run(CodeExecutionOptions.newBuilder()
+//                        .registrationId(cdcAgentsTest).build());
+//        System.out.println(found);
+//    }
 
     @Test
     void testRetrieveRegistrations() {

@@ -53,6 +53,20 @@ code-runner:
       description: "Print working directory"
       timeoutSeconds: 15
       enabled: true
+    - id: "cdc-agents-test"
+      command: "uv"
+      working-directory: "/Users/hayde/IdeaProjects/drools/python_parent/packages/cdc_agents"
+      arguments: "run cdc-agents-test"
+      description: "Test CDC agents"
+      enabled: true
+    - id: "run-test-graph-all"
+      command: "all-test-test-graph.sh"
+      working-directory: "/Users/hayde/IdeaProjects/drools"
+      description: "Run pipeline for all"
+      output-regex:
+        -
+      reporting-paths:
+        - file:///Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test
 
 
 logging.config: classpath:logback.xml

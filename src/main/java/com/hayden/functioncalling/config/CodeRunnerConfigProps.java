@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,8 @@ public class CodeRunnerConfigProps {
         private String arguments;
         private Integer timeoutSeconds = 60;
         private boolean enabled = true;
+        private List<Path> reportingPaths = new ArrayList<>();
+        private List<String> outputRegex = new ArrayList<>();
     }
 
 }

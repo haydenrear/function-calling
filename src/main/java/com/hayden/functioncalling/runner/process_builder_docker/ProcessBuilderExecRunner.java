@@ -7,6 +7,8 @@ import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
 import com.hayden.functioncalling.repository.CodeExecutionRepository;
 import com.hayden.functioncalling.runner.ExecRunner;
 import com.hayden.functioncalling.service.ExecutionDataService;
+import com.hayden.functioncalling.service.TestReportService;
+import com.hayden.utilitymodule.stream.StreamUtil;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
     private final ExecutionDataService executionDataService;
     private final ThreadPoolTaskExecutor runnerTaskExecutor;
     private final ThreadPoolTaskExecutor asyncRunnerTaskExecutor;
+    private final TestReportService testReportService;
 
     @Override
     public CompletableFuture<CodeExecutionResult> runAsync(CodeExecutionOptions codeExecutionResult) {
@@ -145,8 +150,16 @@ public class ProcessBuilderExecRunner implements ExecRunner {
                 String line;
                 writeToLog(writeToFile, outputFile, "Starting output for %s".formatted(entity.getRegistrationId()) + "\n");
                 while ((line = reader.readLine()) != null) {
-                    output.append(line).append("\n");
-                    
+
+                    if (entity.getOutputRegex() != null && !entity.getOutputRegex().isEmpty()) {
+                        String finalLine = line;
+                        if (entity.getOutputRegex().stream().anyMatch(finalLine::matches)) {
+                            output.append(finalLine).append("\n");
+                        }
+                    } else {
+                        output.append(line).append("\n");
+                    }
+
                     // If we're writing to a file, append each line as it comes
                     writeToLog(writeToFile, outputFile, line + "\n");
                 }
@@ -196,9 +209,27 @@ public class ProcessBuilderExecRunner implements ExecRunner {
                 writeToLog(writeToFile, outputFile, "\n" + error + "\n");
             }
         }
-        
+
+        var reporting = StreamUtil.toStream(entity.getReportingPaths())
+                .flatMap(s -> {
+                    try {
+                        return Stream.ofNullable(testReportService.getFailureContext(s));
+                    } catch (RuntimeException e) {
+                        return Stream.empty();
+                    }
+                })
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        var outputStr = output.toString();
+
+        if (StringUtils.isNotBlank(reporting)) {
+            outputStr = reporting;
+        }
+
         // Save execution history
-        executionDataService.saveExecutionHistory(entity.getRegistrationId(), executionId, entity.getCommand(), arguments, output.toString(), error, success, exitCode, executionTimeMs);
+        executionDataService.saveExecutionHistory(
+                entity.getRegistrationId(), executionId, entity.getCommand(), arguments,
+                outputStr, error, success, exitCode, executionTimeMs);
 
         return CodeExecutionResult.newBuilder()
                 .success(success)
@@ -219,7 +250,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
                 log.error("Error writing to file", e);
             }
         } else {
-            log.error("Writing to file: {}", outputFile);
+            log.info("{}", entity);
         }
     }
 

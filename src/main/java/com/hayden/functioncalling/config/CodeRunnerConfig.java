@@ -38,6 +38,10 @@ public class CodeRunnerConfig {
                     .arguments(reg.getArguments())
                     .timeoutSeconds(reg.getTimeoutSeconds())
                     .enabled(reg.isEnabled())
+                    .reportingPaths(reg.getReportingPaths().stream()
+                            .map(p -> p.toFile().getAbsolutePath())
+                            .toList())
+                    .outputRegex(reg.getOutputRegex())
                     .build();
 
             codeExecutionRepository.save(entity);

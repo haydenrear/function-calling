@@ -4,6 +4,8 @@ import com.hayden.persistence.models.JpaHibernateAuditedIded;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "code_execution_registrations")
 @Builder
@@ -33,4 +35,10 @@ public class CodeExecutionEntity extends JpaHibernateAuditedIded {
     
     @Column(nullable = false)
     private Boolean enabled;
+
+    @Column
+    private List<String> reportingPaths;
+
+    @Column
+    private List<String> outputRegex;
 }

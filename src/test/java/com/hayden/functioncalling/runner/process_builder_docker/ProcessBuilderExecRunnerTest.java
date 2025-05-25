@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@Transactional
 public class ProcessBuilderExecRunnerTest {
 
     @Autowired
