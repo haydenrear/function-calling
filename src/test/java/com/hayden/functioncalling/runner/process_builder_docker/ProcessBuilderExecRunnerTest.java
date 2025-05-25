@@ -6,6 +6,7 @@ import com.hayden.functioncalling.entity.CodeExecutionEntity;
 import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
 import com.hayden.functioncalling.repository.CodeExecutionRepository;
 import com.hayden.functioncalling.service.ExecutionDataService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,6 +94,7 @@ public class ProcessBuilderExecRunnerTest {
         assertThat(result.getError()).contains("No code execution registration found with ID");
     }
 
+    @SneakyThrows
     @Test
     void testRunWithDisabledRegistration() {
         // Disable the registration
@@ -112,6 +114,7 @@ public class ProcessBuilderExecRunnerTest {
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();
         assertThat(result.getError()).contains("Code execution registration is disabled");
+
     }
 
     @Test

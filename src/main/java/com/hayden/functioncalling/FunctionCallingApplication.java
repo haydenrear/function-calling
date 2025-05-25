@@ -4,7 +4,6 @@ import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAu
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.otlp.OtlpMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication(exclude = {OtlpMetricsExportAutoConfiguration.class,
                                   PgVectorStoreAutoConfiguration.class})

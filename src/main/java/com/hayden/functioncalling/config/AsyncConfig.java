@@ -9,10 +9,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 @Configuration
-public class AsyncConfig implements AsyncConfigurer {
+public class AsyncConfig {
 
-    @Bean(name = "taskExecutor")
-    public Executor taskExecutor() {
+    @Bean
+    public ThreadPoolTaskExecutor runnerTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(10);
@@ -22,8 +22,4 @@ public class AsyncConfig implements AsyncConfigurer {
         return executor;
     }
 
-    @Override
-    public Executor getAsyncExecutor() {
-        return taskExecutor();
-    }
 }

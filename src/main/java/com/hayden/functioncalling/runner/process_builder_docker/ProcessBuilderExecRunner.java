@@ -10,7 +10,6 @@ import com.hayden.functioncalling.service.ExecutionDataService;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -24,10 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,14 +32,11 @@ public class ProcessBuilderExecRunner implements ExecRunner {
     
     private final CodeExecutionRepository codeExecutionRepository;
     private final ExecutionDataService executionDataService;
-
-    @Autowired
-    ThreadPoolTaskExecutor taskExecutor;
+    private final ThreadPoolTaskExecutor runnerTaskExecutor;
 
     @Override
-    @Async
-    public Future<CodeExecutionResult> runAsync(CodeExecutionOptions codeExecutionResult) {
-        return taskExecutor.submit(() -> this.run(codeExecutionResult));
+    public CompletableFuture<CodeExecutionResult> runAsync(CodeExecutionOptions codeExecutionResult) {
+        return runnerTaskExecutor.submitCompletable(() -> this.run(codeExecutionResult));
     }
 
     @Override
@@ -161,7 +154,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
             }
         });
 
-        taskExecutor.submit(outputThread);
+        var out = this.runnerTaskExecutor.submitCompletable(outputThread);
 
         // Wait for the process to complete
         boolean completed;
@@ -172,8 +165,10 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         
         // Wait for the output thread to finish reading
         try {
-            outputThread.join(1000); // Wait up to 1 second for the thread to finish
-        } catch (InterruptedException e) {
+            out.get(1000, TimeUnit.MILLISECONDS); // Wait up to 1 second for the thread to finish
+        } catch (InterruptedException |
+                 ExecutionException |
+                 TimeoutException e) {
             log.warn("Interrupted while waiting for output thread to complete", e);
         }
         
