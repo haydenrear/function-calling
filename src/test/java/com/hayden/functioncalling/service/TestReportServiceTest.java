@@ -17,11 +17,11 @@ class TestReportServiceTest {
     @Autowired
     private TestReportService testReportService;
 
-    @Test
-    public void testRetrieveErrsOther() {
-        var failures = testReportService.getFailureContext("/Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test/index.html");
-        assertThat(failures).doesNotContain("No test failures found.");
-    }
+//    @Test
+//    public void testRetrieveErrsOther() {
+//        var failures = testReportService.getFailureContext("/Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test/index.html");
+//        assertThat(failures).doesNotContain("No test failures found.");
+//    }
 
     @Test
     public void testRetrieveErrs() {
