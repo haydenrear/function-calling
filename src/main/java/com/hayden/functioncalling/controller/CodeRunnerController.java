@@ -73,7 +73,8 @@ public class CodeRunnerController {
             @InputArgument String command,
             @InputArgument String workingDirectory,
             @InputArgument String arguments,
-            @InputArgument Integer timeoutSeconds) {
+            @InputArgument Integer timeoutSeconds,
+            @InputArgument String sessionId) {
         
         Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
@@ -82,6 +83,8 @@ public class CodeRunnerController {
         }
         
         CodeExecutionEntity entity = entityOpt.get();
+
+        entity.setSessionId(sessionId);
         
         if (enabled != null) {
             entity.setEnabled(enabled);
@@ -111,7 +114,7 @@ public class CodeRunnerController {
 
     @DgsMutation
     @Transactional
-    public Boolean deleteCodeExecutionRegistration(@InputArgument String registrationId) {
+    public Boolean deleteCodeExecutionRegistration(@InputArgument String registrationId, @InputArgument String sessionId) {
         Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
             log.warn("Cannot delete - no code execution registration found with ID: {}", registrationId);
@@ -131,6 +134,7 @@ public class CodeRunnerController {
         if (options == null || options.getRegistrationId() == null) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
+                    .sessionId(options.getSessionId())
                     .error(List.of(new Error("Invalid execution options. Registration ID is required.")))
                     .build();
         }
@@ -145,6 +149,7 @@ public class CodeRunnerController {
         if (options == null || options.getRegistrationId() == null) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
+                    .sessionId(options.getSessionId())
                     .error(List.of(new Error("Invalid execution options. Registration ID is required.")))
                     .build();
         }
@@ -152,6 +157,8 @@ public class CodeRunnerController {
         // Set the file writing flag and path
         CodeExecutionOptions modifiedOptions = CodeExecutionOptions.newBuilder()
                 .registrationId(options.getRegistrationId())
+                .sessionId(options.getSessionId())
+                .sessionId(options.getSessionId())
                 .arguments(options.getArguments())
                 .timeoutSeconds(options.getTimeoutSeconds())
                 .writeToFile(true)
@@ -175,6 +182,7 @@ public class CodeRunnerController {
     
     private CodeExecution mapToExecution(CodeExecutionHistory entity) {
         return CodeExecution.newBuilder()
+                .sessionId(entity.getSessionId())
                 .registrationId(entity.getExecutionId())
                 .command(entity.getCommand() + (entity.getArguments() != null ? " " + entity.getArguments() : ""))
                 .status(entity.getSuccess() ? "SUCCESS" : "FAILED")
@@ -193,18 +201,12 @@ public class CodeRunnerController {
         return LocalDate.ofInstant(Instant.ofEpochMilli(localDateTime), ZoneId.systemDefault()) ;
     }
 
-    private LocalDate convertToDate(LocalDateTime localDateTime) {
-        if (localDateTime == null) {
-            return null;
-        }
-        return LocalDate.from(localDateTime.toInstant(ZoneOffset.UTC));
-    }
-    
     @DgsQuery
-    public CodeExecutionResult getExecutionOutput(@InputArgument String executionId) {
+    public CodeExecutionResult getExecutionOutput(@InputArgument String executionId, @InputArgument String sessionId) {
         if (executionId == null || executionId.isBlank()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
+                    .sessionId(sessionId)
                     .error(List.of(new Error("Execution ID is required")))
                     .build();
         }
@@ -214,6 +216,7 @@ public class CodeRunnerController {
         
         if (historyOpt.isEmpty()) {
             return CodeExecutionResult.newBuilder()
+                    .sessionId(sessionId)
                     .success(false)
                     .error(List.of(new Error("No execution found with ID: " + executionId)))
                     .build();
@@ -222,6 +225,7 @@ public class CodeRunnerController {
         CodeExecutionHistory history = historyOpt.get();
         
         return CodeExecutionResult.newBuilder()
+                .sessionId(sessionId)
                 .success(history.getSuccess())
                 .output(history.getOutput())
                 .error(List.of(new Error(history.getError())))

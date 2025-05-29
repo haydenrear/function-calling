@@ -98,7 +98,7 @@ public class FunctionCallingIntegrationTest {
         assertThat(historyRepository.findByExecutionId(executionId)).isPresent();
         
         // 6. Get execution output by ID
-        CodeExecutionResult retrievedResult = controller.getExecutionOutput(executionId);
+        CodeExecutionResult retrievedResult = controller.getExecutionOutput(executionId, "test_session");
         assertThat(retrievedResult).isNotNull();
         assertThat(retrievedResult.getOutput()).isEqualTo(result.getOutput());
         
@@ -121,7 +121,7 @@ public class FunctionCallingIntegrationTest {
                 "cat",
                 null,
                 null,
-                5);
+                5, "test_session");
                 
         assertThat(updatedReg).isNotNull();
         assertThat(updatedReg.getCommand()).isEqualTo("cat");
@@ -136,7 +136,7 @@ public class FunctionCallingIntegrationTest {
         assertThat(executions).isNotEmpty();
         
         // 12. Delete the registration
-        Boolean deleteResult = controller.deleteCodeExecutionRegistration(registrationId);
+        Boolean deleteResult = controller.deleteCodeExecutionRegistration(registrationId, "test_session");
         assertThat(deleteResult).isTrue();
         
         // 13. Verify it's gone

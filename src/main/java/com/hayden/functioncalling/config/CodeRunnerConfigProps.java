@@ -1,15 +1,11 @@
 package com.hayden.functioncalling.config;
 
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
-import com.hayden.functioncalling.repository.CodeExecutionRepository;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -36,6 +32,7 @@ public class CodeRunnerConfigProps {
         private boolean enabled = true;
         private List<Path> reportingPaths = new ArrayList<>();
         private List<String> outputRegex = new ArrayList<>();
+        private Path runnerCopyPath;
     }
 
 }

@@ -41,4 +41,10 @@ public class CodeExecutionEntity extends JpaHibernateAuditedIded {
 
     @Column
     private List<String> outputRegex;
+
+    @Column
+    private String runnerCopyPath;
+
+    @Column
+    private String sessionId;
 }

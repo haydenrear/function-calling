@@ -39,4 +39,7 @@ public class CodeExecutionHistory extends JpaHibernateAuditedIded {
     
     @Column
     private Integer executionTimeMs;
+
+    @Column
+    private String sessionId;
 }

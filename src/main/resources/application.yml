@@ -42,6 +42,8 @@ code-runner:
       arguments: "run cdc-agents-test"
       description: "Test CDC agents"
       enabled: true
+      runner-copy-path:
+        - file:///Users/hayde/cdc_agents/work
     - id: "run-test-graph-all"
       enabled: true
       command: "/bin/zsh"
@@ -52,6 +54,8 @@ code-runner:
         - file:///Users/hayde/IdeaProjects/drools/commit-diff-context-graphql/build/reports/tests/test/index.html
         - file:///Users/hayde/IdeaProjects/drools/runner-logs/test-report-log.log
         - file:///Users/hayde/IdeaProjects/drools/test_graph/build/reports/tests/test/index.html
+      runner-copy-path:
+        - file:///Users/hayde/cdc_agents/work
 
 
 logging.config: classpath:logback.xml

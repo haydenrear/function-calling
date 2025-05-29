@@ -16,10 +16,11 @@ public class ExecutionDataService {
 
     @Transactional
     public void saveExecutionHistory(String registrationId, String executionId, String command, String arguments,
-                                     String output, String error, boolean success, int exitCode, int executionTimeMs) {
+                                     String output, String error, boolean success, int exitCode, int executionTimeMs, String sessionId) {
         try {
             CodeExecutionHistory history = CodeExecutionHistory.builder()
                     .registrationId(registrationId)
+                    .sessionId(sessionId)
                     .executionId(executionId)
                     .command(command)
                     .arguments(arguments)

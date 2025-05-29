@@ -12,6 +12,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Optional;
+
 @Configuration
 @Slf4j
 public class CodeRunnerConfig {
@@ -32,12 +36,14 @@ public class CodeRunnerConfig {
 
             CodeExecutionEntity entity = CodeExecutionEntity.builder()
                     .registrationId(reg.getId())
+                    .sessionId("STARTUP")
                     .command(reg.getCommand())
                     .workingDirectory(reg.getWorkingDirectory())
                     .description(reg.getDescription())
                     .arguments(reg.getArguments())
                     .timeoutSeconds(reg.getTimeoutSeconds())
                     .enabled(reg.isEnabled())
+                    .runnerCopyPath(Optional.ofNullable(reg.getRunnerCopyPath()).map(Path::toFile).map(File::getAbsolutePath).orElse(null))
                     .reportingPaths(reg.getReportingPaths().stream()
                             .map(p -> p.toFile().getAbsolutePath())
                             .toList())

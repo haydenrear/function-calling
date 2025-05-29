@@ -216,7 +216,7 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         var reporting = StreamUtil.toStream(entity.getReportingPaths())
                 .flatMap(s -> {
                     try {
-                        return Stream.ofNullable(testReportService.getFailureContext(s));
+                        return Stream.ofNullable(testReportService.getFailureContext(s,  entity.getRegistrationId(), options.getSessionId()));
                     } catch (RuntimeException e) {
                         return Stream.empty();
                     }
@@ -232,12 +232,13 @@ public class ProcessBuilderExecRunner implements ExecRunner {
         // Save execution history
         executionDataService.saveExecutionHistory(
                 entity.getRegistrationId(), executionId, entity.getCommand(), arguments,
-                outputStr, error, success, exitCode, executionTimeMs);
+                outputStr, error, success, exitCode, executionTimeMs, options.getSessionId());
 
         return CodeExecutionResult.newBuilder()
                 .registrationId(options.getRegistrationId())
                 .success(success)
                 .output(output.toString())
+                .sessionId(options.getSessionId())
                 .exitCode(exitCode)
                 .executionTime(executionTimeMs)
                 .executionId(executionId)

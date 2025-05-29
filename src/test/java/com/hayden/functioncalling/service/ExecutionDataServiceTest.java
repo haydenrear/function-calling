@@ -49,8 +49,8 @@ public class ExecutionDataServiceTest {
                 error,
                 success,
                 exitCode,
-                executionTimeMs
-        );
+                executionTimeMs,
+                "test_session");
 
         // Then
         verify(executionHistoryRepository, times(1)).save(historyCaptor.capture());
@@ -88,8 +88,8 @@ public class ExecutionDataServiceTest {
                 error,
                 success,
                 exitCode,
-                executionTimeMs
-        );
+                executionTimeMs,
+                "test_session");
 
         // Then
         verify(executionHistoryRepository, times(1)).save(historyCaptor.capture());
@@ -122,8 +122,8 @@ public class ExecutionDataServiceTest {
                 null,
                 true,
                 0,
-                100
-        );
+                100,
+                "test_session");
 
         // Then - verify the method handled the exception
         verify(executionHistoryRepository, times(1)).save(any());

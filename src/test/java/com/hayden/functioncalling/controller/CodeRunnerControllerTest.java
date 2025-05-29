@@ -151,7 +151,8 @@ public class CodeRunnerControllerTest {
                 "ls",
                 null, 
                 "-la", 
-                20);
+                20,
+                "test_session");
         
         assertThat(result).isNotNull();
         assertThat(result.getCommand()).isEqualTo("ls");
@@ -167,7 +168,8 @@ public class CodeRunnerControllerTest {
 
     @Test
     void testDeleteCodeExecutionRegistration() {
-        Boolean result = controller.deleteCodeExecutionRegistration(registrationId);
+        Boolean result = controller.deleteCodeExecutionRegistration(registrationId,
+                "test_session");
         
         assertThat(result).isTrue();
         assertThat(executionRepository.findByRegistrationId(registrationId)).isEmpty();
@@ -212,7 +214,8 @@ public class CodeRunnerControllerTest {
         assertThat(executeResult).isNotNull();
         
         // Then get the output for that execution
-        CodeExecutionResult result = controller.getExecutionOutput(executeResult.getExecutionId());
+        CodeExecutionResult result = controller.getExecutionOutput(executeResult.getExecutionId(),
+                "test_session");
         
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isTrue();
