@@ -44,9 +44,10 @@ public class TestReportService {
             FileUtils.writeToFile(processed, path.resolve("processed-%s.txt".formatted(Timestamp.from(Instant.now()).toString())));
             var toMoveTo = Paths.get(runnerCopyPath, sessionId);
             FileUtils.copyAll(path, toMoveTo);
-            advisoryLock.doUnlock(sessionId, "function-calling");
         } catch (IOException e) {
             log.error("Failed to copy {} to {}, {}", path, runnerCopyPath, e.getMessage());
+        } finally {
+            advisoryLock.doUnlockRecursive(sessionId, "function-calling");
         }
 
         return processed;
