@@ -61,4 +61,10 @@ public class CodeRunnerConfig {
 
     }
 
+    @Bean
+    public CommandLineRunner checkLocks(AdvisoryLock advisoryLock) {
+        advisoryLock.scheduleAdvisoryLockLogger();
+        return args -> {};
+    }
+
 }
