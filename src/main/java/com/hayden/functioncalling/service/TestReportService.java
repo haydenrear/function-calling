@@ -2,16 +2,19 @@ package com.hayden.functioncalling.service;
 
 import com.hayden.functioncalling.config.CodeRunnerConfigProps;
 import com.hayden.functioncalling.utils.TestResultsProcessor;
+import com.hayden.persistence.lock.AdvisoryLock;
+import com.hayden.utilitymodule.io.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * Service for handling test reports
@@ -23,7 +26,7 @@ public class TestReportService {
     
     private final TestResultsProcessor testResultsProcessor;
 
-    private final CodeRunnerConfigProps configProps;
+    private final AdvisoryLock advisoryLock;
     
 
     /**
@@ -38,14 +41,18 @@ public class TestReportService {
         }
 
         String absolutePath = path.toFile().getAbsolutePath();
-        var t = testResultsProcessor.processTestFailures(absolutePath);
+        var processed = testResultsProcessor.processTestFailures(absolutePath);
 
         try {
-            Files.copy(path, Paths.get(runnerCopyPath, path.toFile().getName()), StandardCopyOption.REPLACE_EXISTING);
+            advisoryLock.doLock(sessionId);
+            FileUtils.writeToFile(processed, path.resolve("processed-%s.txt".formatted(Timestamp.from(Instant.now()).toString())));
+            var toMoveTo = Paths.get(runnerCopyPath, sessionId);
+            FileUtils.copyAll(path, toMoveTo);
+            advisoryLock.doUnlock(sessionId);
         } catch (IOException e) {
             log.error("Failed to copy {} to {}, {}", path, runnerCopyPath, e.getMessage());
         }
 
-        return t;
+        return processed;
     }
 }

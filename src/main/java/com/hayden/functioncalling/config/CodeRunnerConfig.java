@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hayden.commitdiffmodel.convert.CommitDiffContextMapper;
 import com.hayden.functioncalling.entity.CodeExecutionEntity;
 import com.hayden.functioncalling.repository.CodeExecutionRepository;
+import com.hayden.persistence.lock.AdvisoryLock;
 import com.querydsl.core.annotations.Config;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 @Configuration
 @Slf4j
+@Import(AdvisoryLock.class)
 public class CodeRunnerConfig {
 
     @Bean
