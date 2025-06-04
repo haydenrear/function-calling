@@ -1,12 +1,9 @@
 package com.hayden.functioncalling;
 
-import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.otlp.OtlpMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(exclude = {OtlpMetricsExportAutoConfiguration.class,
-                                  PgVectorStoreAutoConfiguration.class})
+@SpringBootApplication
 public class FunctionCallingApplication {
 
     public static void main(String[] args) {

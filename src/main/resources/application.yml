@@ -64,6 +64,10 @@ logging:
   level:
     org.springframework.boot: INFO
 
+
+
+spring.ai.vectorstore.type: none
+
 endpoints:
   zookeeper:
     enabled: false
