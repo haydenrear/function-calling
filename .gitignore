@@ -38,3 +38,4 @@ out/
 out/**
 target
 bin/*
+test_work/*

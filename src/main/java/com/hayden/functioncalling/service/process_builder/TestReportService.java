@@ -41,9 +41,17 @@ public class TestReportService {
 
             advisoryLock.doWithAdvisoryLock(() -> {
                 try {
-                    FileUtils.writeToFile(processed, path.resolve("processed-%s.txt".formatted(Timestamp.from(Instant.now()).toString())));
+                    FileUtils.writeToFile(processed, path.resolve(sessionId).resolve("processed-%s.txt".formatted(Timestamp.from(Instant.now()).toString())));
                     var toMoveTo = Paths.get(runnerCopyPath, sessionId);
-                    FileUtils.copyAll(path, toMoveTo);
+                    Path copyPath;
+                    if (path.toFile().isFile())
+                        copyPath = path.getParent();
+                    else
+                        copyPath = path;
+                    if (copyPath.toFile().exists() || copyPath.toFile().isDirectory()) {
+                        log.error("Could not find valid test reporting path from {}: {}", path, copyPath);
+                    }
+                    FileUtils.copyAll(copyPath, toMoveTo);
                 } catch (IOException e) {
                     log.error("Failed to copy {} to {}, {}", path, runnerCopyPath, e.getMessage());
                 }
