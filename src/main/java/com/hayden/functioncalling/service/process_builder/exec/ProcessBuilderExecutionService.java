@@ -5,6 +5,7 @@ import com.hayden.functioncalling.service.process_builder.ProcessExecutionResult
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -47,31 +48,7 @@ public class ProcessBuilderExecutionService {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         // Start a thread to read the process output
-        Thread outputThread = new Thread(() -> {
-            try {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    fullLog.append(line).append("\n");
-
-                    // Apply output regex filtering if specified
-                    if (request.getOutputRegex() != null && !request.getOutputRegex().isEmpty()) {
-                        String finalLine = line;
-                        if (request.getOutputRegex().stream().anyMatch(finalLine::matches)) {
-                            output.append(finalLine).append("\n");
-                        }
-                    } else {
-                        output.append(line).append("\n");
-                    }
-
-                    // Write to file if specified
-                    if (request.getOutputFile() != null) {
-                        writeToFile(request.getOutputFile(), line + "\n");
-                    }
-                }
-            } catch (IOException e) {
-                log.error("Error reading process output", e);
-            }
-        });
+        Thread outputThread = execThread(request, reader, fullLog, output);
 
         CompletableFuture<Void> outputFuture = runnerTaskExecutor.submitCompletable(outputThread);
 
@@ -80,9 +57,10 @@ public class ProcessBuilderExecutionService {
 
         // Wait for the output thread to finish reading
         try {
-            outputFuture.get(1, TimeUnit.SECONDS);
+            outputFuture.get(5, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             log.warn("Interrupted while waiting for output thread to complete", e);
+            completed = false;
         }
 
         int exitCode;
@@ -162,10 +140,114 @@ public class ProcessBuilderExecutionService {
         StringBuilder fullLog = new StringBuilder();
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-        boolean patternFound = false;
-        boolean failureFound = false;
+        PatternsChecked checkPatterns = new PatternsChecked(false, false);
+
         String error = null;
 
+        Thread outputThread = execThread(request, reader, fullLog, output);
+
+        CompletableFuture<Void> outputFuture = runnerTaskExecutor.submitCompletable(outputThread);
+
+        int maxWaitSeconds = request.numWaitSeconds();
+
+        long endTime = System.currentTimeMillis() + (maxWaitSeconds * 1000L);
+
+        while (System.currentTimeMillis() < endTime && process.isAlive() && checkPatterns.isNotComplete()) {
+            String currentOutput = fullLog.toString();
+
+            checkPatterns = checkPatterns.doCheckPatterns(request, currentOutput);
+
+            if (checkPatterns.failureFound()) {
+                error = "Failure pattern detected in output";
+                break;
+            }
+
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        if (checkPatterns.isNotComplete()) {
+            checkPatterns = checkPatterns.doCheckPatterns(request, fullLog.toString());
+        }
+
+        try {
+            outputFuture.get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            log.warn("Interrupted while waiting for output thread to complete", e);
+        }
+
+        int exitCode = 0;
+        int executionTimeMs = (int)(System.currentTimeMillis() - startTime);
+        boolean success;
+
+        if (checkPatterns.isNotComplete() && !process.isAlive()) {
+            exitCode = process.exitValue();
+            if (exitCode != 0) {
+                error = "Process exited with non-zero status: " + exitCode;
+                success = false;
+            } else if (request.getSuccessPatterns() != null && !request.getSuccessPatterns().isEmpty()) {
+                error = "Process completed but success pattern not found in output";
+                success = false;
+            } else {
+                success = true;
+            }
+        } else {
+            error = "Pattern wait timed out after " + maxWaitSeconds + " seconds";
+            success = checkPatterns.isSuccess();
+        }
+
+        if (request.getOutputFile() != null && error != null) {
+            writeToFile(request.getOutputFile(), "\n" + error + "\n");
+        }
+
+        return ProcessExecutionResult.builder()
+                .success(success)
+                .output(output.toString())
+                .fullLog(fullLog.toString())
+                .error(error)
+                .exitCode(exitCode)
+                .executionTimeMs(executionTimeMs)
+                .process(process)
+                .build();
+    }
+
+
+
+    private record PatternsChecked(boolean patternFound, boolean failureFound) {
+        boolean isComplete() {
+            return patternFound || failureFound;
+        }
+
+        boolean isNotComplete() {
+            return !isComplete();
+        }
+
+        boolean isSuccess() {
+            return patternFound() && !failureFound();
+        }
+
+        private PatternsChecked doCheckPatterns(ProcessExecutionRequest request, String currentOutput) {
+            // Check for success patterns
+            boolean patternFound = this.patternFound;
+            boolean failureFound = this.failureFound;
+            if (request.getSuccessPatterns() != null && !request.getSuccessPatterns().isEmpty() && !patternFound) {
+                patternFound = request.getSuccessPatterns().stream()
+                        .anyMatch(pattern -> Pattern.compile(pattern).matcher(currentOutput).find());
+            }
+            if (request.getFailurePatterns() != null && !request.getFailurePatterns().isEmpty() && !failureFound) {
+                failureFound = request.getFailurePatterns().stream()
+                        .anyMatch(pattern -> Pattern.compile(pattern).matcher(currentOutput).find());
+            }
+
+            return new PatternsChecked(patternFound, failureFound);
+        }
+    }
+
+    private @NotNull Thread execThread(ProcessExecutionRequest request, BufferedReader reader, StringBuilder fullLog, StringBuilder output) {
         Thread outputThread = new Thread(() -> {
             try {
                 String line;
@@ -189,86 +271,7 @@ public class ProcessBuilderExecutionService {
                 log.error("Error reading process output", e);
             }
         });
-
-        CompletableFuture<Void> outputFuture = runnerTaskExecutor.submitCompletable(outputThread);
-
-        // Wait for patterns with timeout
-        int maxWaitSeconds = request.getMaxWaitForPatternSeconds() != null ?
-                            request.getMaxWaitForPatternSeconds() :
-                            (request.getTimeoutSeconds() != null ? request.getTimeoutSeconds() : 300);
-
-        long endTime = System.currentTimeMillis() + (maxWaitSeconds * 1000L);
-
-        while (System.currentTimeMillis() < endTime && process.isAlive() && !patternFound && !failureFound) {
-            String currentOutput = fullLog.toString();
-
-            // Check for success patterns
-            if (request.getSuccessPatterns() != null && !request.getSuccessPatterns().isEmpty()) {
-                patternFound = request.getSuccessPatterns().stream()
-                        .anyMatch(pattern -> Pattern.compile(pattern).matcher(currentOutput).find());
-            }
-
-            // Check for failure patterns
-            if (request.getFailurePatterns() != null && !request.getFailurePatterns().isEmpty()) {
-                failureFound = request.getFailurePatterns().stream()
-                        .anyMatch(pattern -> Pattern.compile(pattern).matcher(currentOutput).find());
-            }
-
-            if (failureFound) {
-                error = "Failure pattern detected in output";
-                break;
-            }
-
-            try {
-                Thread.sleep(1000); // Check every second
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-
-        // Wait for the output thread to finish reading
-        try {
-            outputFuture.get(1, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            log.warn("Interrupted while waiting for output thread to complete", e);
-        }
-
-        int exitCode = 0;
-        boolean success = patternFound && !failureFound;
-        int executionTimeMs = (int)(System.currentTimeMillis() - startTime);
-
-        if (!patternFound && !failureFound) {
-            if (!process.isAlive()) {
-                exitCode = process.exitValue();
-                if (exitCode != 0) {
-                    error = "Process exited with non-zero status: " + exitCode;
-                    success = false;
-                } else if (request.getSuccessPatterns() != null && !request.getSuccessPatterns().isEmpty()) {
-                    error = "Process completed but success pattern not found in output";
-                    success = false;
-                } else {
-                    success = true;
-                }
-            } else {
-                error = "Pattern wait timed out after " + maxWaitSeconds + " seconds";
-                success = false;
-            }
-        }
-
-        if (request.getOutputFile() != null && error != null) {
-            writeToFile(request.getOutputFile(), "\n" + error + "\n");
-        }
-
-        return ProcessExecutionResult.builder()
-                .success(success)
-                .output(output.toString())
-                .fullLog(fullLog.toString())
-                .error(error)
-                .exitCode(exitCode)
-                .executionTimeMs(executionTimeMs)
-                .process(process)
-                .build();
+        return outputThread;
     }
 
     private List<String> buildCommandParts(String command, String arguments) {

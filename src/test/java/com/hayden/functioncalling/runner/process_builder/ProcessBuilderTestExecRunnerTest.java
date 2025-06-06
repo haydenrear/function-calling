@@ -27,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ProcessBuilderExecRunnerTest {
+public class ProcessBuilderTestExecRunnerTest {
 
     @Autowired
-    private ProcessBuilderExecRunner execRunner;
+    private ProcessBuilderTestExecRunner execRunner;
 
     @Autowired
     private TestExecutionRepository executionRepository;
@@ -177,7 +177,7 @@ public class ProcessBuilderExecRunnerTest {
         long endTime = System.currentTimeMillis();
 
         // Should not take more than ~2 seconds (giving some buffer for processing)
-        assertTrue((endTime - startTime) < 5000);
+        assertTrue((endTime - startTime) < 8000);
         
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();

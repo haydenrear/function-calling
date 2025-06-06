@@ -160,7 +160,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 .build();
     }
 
-    private CodeDeployResult executeStopCommand(CodeDeployEntity entity, String sessionId) throws Exception {
+    public CodeDeployResult executeStopCommand(CodeDeployEntity entity, String sessionId) throws Exception {
         String deployId = UUID.randomUUID().toString();
 
         ProcessExecutionRequest request = ProcessExecutionRequest.builder()

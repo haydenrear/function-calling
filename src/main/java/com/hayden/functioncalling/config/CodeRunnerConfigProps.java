@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CodeRunnerConfigProps {
 
-    private List<TestExecutionRegistration> registrations = new ArrayList<>();
+    private List<TestExecutionRegistration> testRegistrations = new ArrayList<>();
     private List<BuildRegistration> buildRegistrations = new ArrayList<>();
     private List<DeployRegistration> deployRegistrations = new ArrayList<>();
 
     @Data
     public static class TestExecutionRegistration {
 
-        private String id;
+        private String registrationId;
         private String command;
         private String workingDirectory;
         private String description;
@@ -38,7 +38,7 @@ public class CodeRunnerConfigProps {
     @Data
     public static class BuildRegistration {
 
-        private String id;
+        private String registrationId;
         private String buildCommand;
         private String workingDirectory;
         private String description;
@@ -55,7 +55,7 @@ public class CodeRunnerConfigProps {
     @Data
     public static class DeployRegistration {
 
-        private String id;
+        private String registrationId;
         private String deployCommand;
         private String workingDirectory;
         private String description;

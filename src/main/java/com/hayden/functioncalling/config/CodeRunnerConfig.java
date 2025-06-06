@@ -39,19 +39,19 @@ public class CodeRunnerConfig {
         // Initialize execution registrations
         log.info(
             "Initializing code runner registrations from configuration: {}",
-            registrations.getRegistrations()
+            registrations.getTestRegistrations()
         );
-        for (CodeRunnerConfigProps.TestExecutionRegistration reg : registrations.getRegistrations()) {
-            if (testExecutionRepository.existsByRegistrationId(reg.getId())) {
+        for (CodeRunnerConfigProps.TestExecutionRegistration reg : registrations.getTestRegistrations()) {
+            if (testExecutionRepository.existsByRegistrationId(reg.getRegistrationId())) {
                 log.info(
                     "Registration with ID {} already exists, skipping",
-                    reg.getId()
+                    reg.getRegistrationId()
                 );
                 continue;
             }
 
             TestExecutionEntity entity = TestExecutionEntity.builder()
-                .registrationId(reg.getId())
+                .registrationId(reg.getRegistrationId())
                 .sessionId("STARTUP")
                 .command(reg.getCommand())
                 .workingDirectory(reg.getWorkingDirectory())
@@ -76,7 +76,7 @@ public class CodeRunnerConfig {
                 .build();
 
             testExecutionRepository.save(entity);
-            log.info("Added code execution registration: {}", reg.getId());
+            log.info("Added code execution registration: {}", reg.getRegistrationId());
         }
 
         // Initialize build registrations
@@ -85,16 +85,16 @@ public class CodeRunnerConfig {
             registrations.getBuildRegistrations()
         );
         for (CodeRunnerConfigProps.BuildRegistration reg : registrations.getBuildRegistrations()) {
-            if (codeBuildRepository.existsByRegistrationId(reg.getId())) {
+            if (codeBuildRepository.existsByRegistrationId(reg.getRegistrationId())) {
                 log.info(
                     "Build registration with ID {} already exists, skipping",
-                    reg.getId()
+                    reg.getRegistrationId()
                 );
                 continue;
             }
 
             CodeBuildEntity entity = CodeBuildEntity.builder()
-                .registrationId(reg.getId())
+                .registrationId(reg.getRegistrationId())
                 .sessionId("STARTUP")
                 .buildCommand(reg.getBuildCommand())
                 .workingDirectory(reg.getWorkingDirectory())
@@ -121,7 +121,7 @@ public class CodeRunnerConfig {
                 .build();
 
             codeBuildRepository.save(entity);
-            log.info("Added code build registration: {}", reg.getId());
+            log.info("Added code build registration: {}", reg.getRegistrationId());
         }
 
         // Initialize deploy registrations
@@ -130,16 +130,16 @@ public class CodeRunnerConfig {
             registrations.getDeployRegistrations()
         );
         for (CodeRunnerConfigProps.DeployRegistration reg : registrations.getDeployRegistrations()) {
-            if (codeDeployRepository.existsByRegistrationId(reg.getId())) {
+            if (codeDeployRepository.existsByRegistrationId(reg.getRegistrationId())) {
                 log.info(
                     "Deploy registration with ID {} already exists, skipping",
-                    reg.getId()
+                    reg.getRegistrationId()
                 );
                 continue;
             }
 
             CodeDeployEntity entity = CodeDeployEntity.builder()
-                .registrationId(reg.getId())
+                .registrationId(reg.getRegistrationId())
                 .sessionId("STARTUP")
                 .deployCommand(reg.getDeployCommand())
                 .workingDirectory(reg.getWorkingDirectory())
@@ -157,7 +157,7 @@ public class CodeRunnerConfig {
                 .build();
 
             codeDeployRepository.save(entity);
-            log.info("Added code deploy registration: {}", reg.getId());
+            log.info("Added code deploy registration: {}", reg.getRegistrationId());
         }
 
         return args -> {};

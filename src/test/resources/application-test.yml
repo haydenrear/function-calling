@@ -32,21 +32,104 @@ spring:
       enabled: false
 
 code-runner:
-  registrations:
-    - id: "echo"
+  test-registrations:
+    - registration-id: "echo"
       command: "echo"
       description: "Simple echo command"
       arguments: "Hello, World!"
       timeoutSeconds: 30
       enabled: true
-    - id: "ls"
+    - registration-id: "ls"
       command: "ls"
       description: "List directory contents"
       arguments: "-la"
       timeoutSeconds: 30
       enabled: true
-    - id: "pwd"
+    - registration-id: "pwd"
       command: "pwd"
       description: "Print working directory"
       timeoutSeconds: 15
       enabled: true
+  build-registrations:
+    - registrationId: "test-build-success"
+      buildCommand: "bash"
+      description: "Successful build simulation"
+      arguments: "src/test/resources/scripts/build.sh"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 30
+      enabled: true
+      artifactPaths:
+        - "target/myapp-1.0.0.jar"
+      artifactOutputDirectory: "${java.io.tmpdir}/test-artifacts"
+      buildSuccessPatterns:
+        - "Build completed successfully!"
+      buildFailurePatterns:
+        - "Build failed with errors!"
+    - registrationId: "test-build-fail"
+      buildCommand: "bash"
+      description: "Failing build simulation"
+      arguments: "src/test/resources/scripts/build-fail.sh"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 30
+      enabled: true
+      buildSuccessPatterns:
+        - "Build completed successfully!"
+      buildFailurePatterns:
+        - "Build failed with errors!"
+    - registrationId: "test-build-timeout"
+      buildCommand: "sleep"
+      description: "Build that times out"
+      arguments: "60"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 2
+      enabled: true
+    - registrationId: "test-build-disabled"
+      buildCommand: "echo"
+      description: "Disabled build"
+      arguments: "This should not run"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 30
+      enabled: false
+  deploy-registrations:
+    - registrationId: "test-deploy-success"
+      deployCommand: "bash"
+      description: "Successful deployment simulation"
+      arguments: "src/test/resources/scripts/deploy.sh"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 30
+      enabled: true
+      deploySuccessPatterns:
+        - "Deployment completed successfully!"
+      deployFailurePatterns:
+        - "Deployment failed!"
+      healthCheckUrl: "http://localhost:8080/health"
+      healthCheckTimeoutSeconds: 5
+      maxWaitForStartupSeconds: 10
+      stopCommand: "bash src/test/resources/scripts/stop-deploy.sh"
+    - registrationId: "test-deploy-no-health"
+      deployCommand: "bash"
+      description: "Deployment without health check"
+      arguments: "src/test/resources/scripts/deploy.sh"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 30
+      enabled: true
+      deploySuccessPatterns:
+        - "Deployment completed successfully!"
+      deployFailurePatterns:
+        - "Deployment failed!"
+      stopCommand: "bash src/test/resources/scripts/stop-deploy.sh"
+    - registrationId: "test-deploy-timeout"
+      deployCommand: "sleep"
+      description: "Deploy that times out"
+      arguments: "60"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 2
+      enabled: true
+      maxWaitForStartupSeconds: 1
+    - registrationId: "test-deploy-disabled"
+      deployCommand: "echo"
+      description: "Disabled deployment"
+      arguments: "This should not run"
+      workingDirectory: "${user.dir}"
+      timeoutSeconds: 30
+      enabled: false
