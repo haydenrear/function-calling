@@ -1,38 +1,38 @@
 package com.hayden.functioncalling.entity;
 
+import com.hayden.commitdiffmodel.codegen.types.ExecutionType;
 import com.hayden.persistence.models.JpaHibernateAuditedIded;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
-@Table(name = "code_execution_registrations")
+@Table
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class CodeExecutionEntity extends JpaHibernateAuditedIded {
-    
+public class TestExecutionEntity extends JpaHibernateAuditedIded {
+
     @Column(nullable = false, unique = true)
     private String registrationId;
-    
+
     @Column(nullable = false)
     private String command;
-    
+
     @Column
     private String workingDirectory;
-    
+
     @Column
     private String description;
-    
+
     @Column
     private String arguments;
-    
+
     @Column
     private Integer timeoutSeconds;
-    
+
     @Column(nullable = false)
     private Boolean enabled;
 
@@ -47,4 +47,9 @@ public class CodeExecutionEntity extends JpaHibernateAuditedIded {
 
     @Column
     private String sessionId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ExecutionType executionType = ExecutionType.PROCESS_BUILDER;
 }

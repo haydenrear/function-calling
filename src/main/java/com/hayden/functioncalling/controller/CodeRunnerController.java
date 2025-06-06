@@ -3,10 +3,10 @@ package com.hayden.functioncalling.controller;
 import com.hayden.commitdiffmodel.codegen.types.*;
 import com.hayden.commitdiffmodel.codegen.types.Error;
 import com.hayden.commitdiffmodel.convert.CommitDiffContextMapper;
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
-import com.hayden.functioncalling.entity.CodeExecutionHistory;
-import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
-import com.hayden.functioncalling.repository.CodeExecutionRepository;
+import com.hayden.functioncalling.entity.TestExecutionEntity;
+import com.hayden.functioncalling.entity.TestExecutionHistory;
+import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
+import com.hayden.functioncalling.repository.TestExecutionRepository;
 import com.hayden.functioncalling.runner.ExecRunner;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -14,7 +14,6 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.util.List;
@@ -26,14 +25,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CodeRunnerController {
 
-    private final CodeExecutionRepository executionRepository;
-    private final CodeExecutionHistoryRepository executionHistoryRepository;
+    private final TestExecutionRepository executionRepository;
+    private final TestExecutionHistoryRepository executionHistoryRepository;
     private final ExecRunner execRunner;
     private final CommitDiffContextMapper mapper;
 
     @DgsQuery
     public List<CodeExecutionRegistration> retrieveRegistrations() {
-        List<CodeExecutionEntity> entities = executionRepository.findAll();
+        List<TestExecutionEntity> entities = executionRepository.findAll();
         return entities.stream()
                 .map(this::mapToRegistration)
                 .collect(Collectors.toList());
@@ -41,7 +40,7 @@ public class CodeRunnerController {
     
     @DgsQuery
     public List<CodeExecution> retrieveExecutions() {
-        List<CodeExecutionHistory> entities = executionHistoryRepository.findTop10ByOrderByCreatedTimeDesc();
+        List<TestExecutionHistory> entities = executionHistoryRepository.findTop10ByOrderByCreatedTimeDesc();
         return entities.stream()
                 .map(this::mapToExecution)
                 .collect(Collectors.toList());
@@ -49,15 +48,15 @@ public class CodeRunnerController {
 
     @DgsQuery
     public CodeExecutionRegistration getCodeExecutionRegistration(@InputArgument String registrationId) {
-        Optional<CodeExecutionEntity> entity = executionRepository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> entity = executionRepository.findByRegistrationId(registrationId);
         return entity.map(this::mapToRegistration).orElse(null);
     }
 
     @DgsMutation
-    @Transactional
     public CodeExecutionRegistration registerCodeExecution(
             @InputArgument CodeExecutionRegistrationIn codeExecutionRegistration) {
-        CodeExecutionEntity entity = mapper.map(codeExecutionRegistration, CodeExecutionEntity.class);
+        TestExecutionEntity entity = mapper.map(codeExecutionRegistration, TestExecutionEntity.class);
+        entity.setExecutionType(Optional.ofNullable(entity.getExecutionType()).orElse(ExecutionType.PROCESS_BUILDER));
         
         entity = executionRepository.save(entity);
         log.info("Registered new code execution: {}", entity.getRegistrationId());
@@ -66,7 +65,7 @@ public class CodeRunnerController {
     }
 
     @DgsMutation
-    @Transactional
+    
     public CodeExecutionRegistration updateCodeExecutionRegistration(
             @InputArgument String registrationId,
             @InputArgument Boolean enabled,
@@ -76,13 +75,14 @@ public class CodeRunnerController {
             @InputArgument Integer timeoutSeconds,
             @InputArgument String sessionId) {
         
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
             log.warn("Cannot update - no code execution registration found with ID: {}", registrationId);
             return null;
         }
         
-        CodeExecutionEntity entity = entityOpt.get();
+        TestExecutionEntity entity = entityOpt.get();
+        entity.setExecutionType(Optional.ofNullable(entity.getExecutionType()).orElse(ExecutionType.PROCESS_BUILDER));
 
         entity.setSessionId(sessionId);
         
@@ -113,14 +113,14 @@ public class CodeRunnerController {
     }
 
     @DgsMutation
-    @Transactional
+    
     public Boolean deleteCodeExecutionRegistration(@InputArgument String registrationId, @InputArgument String sessionId) {
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
             log.warn("Cannot delete - no code execution registration found with ID: {}", registrationId);
             return false;
         }
-        
+
         executionRepository.delete(entityOpt.get());
         log.info("Deleted code execution registration: {}", registrationId);
         
@@ -168,10 +168,11 @@ public class CodeRunnerController {
         return execRunner.run(modifiedOptions);
     }
     
-    private CodeExecutionRegistration mapToRegistration(CodeExecutionEntity entity) {
+    private CodeExecutionRegistration mapToRegistration(TestExecutionEntity entity) {
         return CodeExecutionRegistration.newBuilder()
                 .registrationId(entity.getRegistrationId())
                 .command(entity.getCommand())
+                .executionType(Optional.ofNullable(entity.getExecutionType()).orElse(ExecutionType.PROCESS_BUILDER))
                 .workingDirectory(entity.getWorkingDirectory())
                 .description(entity.getDescription())
                 .arguments(entity.getArguments())
@@ -180,8 +181,9 @@ public class CodeRunnerController {
                 .build();
     }
     
-    private CodeExecution mapToExecution(CodeExecutionHistory entity) {
+    private CodeExecution mapToExecution(TestExecutionHistory entity) {
         return CodeExecution.newBuilder()
+                .executionType(Optional.ofNullable(entity.getExecutionType()).orElse(ExecutionType.PROCESS_BUILDER))
                 .sessionId(entity.getSessionId())
                 .registrationId(entity.getExecutionId())
                 .command(entity.getCommand() + (entity.getArguments() != null ? " " + entity.getArguments() : ""))
@@ -212,7 +214,7 @@ public class CodeRunnerController {
         }
         
         // Find the execution history
-        Optional<CodeExecutionHistory> historyOpt = executionHistoryRepository.findByExecutionId(executionId);
+        Optional<TestExecutionHistory> historyOpt = executionHistoryRepository.findByExecutionId(executionId);
         
         if (historyOpt.isEmpty()) {
             return CodeExecutionResult.newBuilder()
@@ -222,7 +224,7 @@ public class CodeRunnerController {
                     .build();
         }
         
-        CodeExecutionHistory history = historyOpt.get();
+        TestExecutionHistory history = historyOpt.get();
         
         return CodeExecutionResult.newBuilder()
                 .sessionId(sessionId)

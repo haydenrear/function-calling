@@ -1,7 +1,7 @@
 package com.hayden.functioncalling.repository;
 
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
-import com.hayden.functioncalling.entity.CodeExecutionHistory;
+import com.hayden.functioncalling.entity.TestExecutionEntity;
+import com.hayden.functioncalling.entity.TestExecutionHistory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@Transactional
+
 public class JpaRepositoryIntegrationTest {
 
     @Autowired
-    private CodeExecutionRepository executionRepository;
+    private TestExecutionRepository executionRepository;
 
     @Autowired
-    private CodeExecutionHistoryRepository historyRepository;
+    private TestExecutionHistoryRepository historyRepository;
 
     private String registrationId;
 
@@ -41,7 +40,7 @@ public class JpaRepositoryIntegrationTest {
     @Test
     void testCodeExecutionEntityPersistence() {
         // Create and save an entity
-        CodeExecutionEntity entity = CodeExecutionEntity.builder()
+        TestExecutionEntity entity = TestExecutionEntity.builder()
                 .registrationId(registrationId)
                 .command("test-command")
                 .workingDirectory("/tmp")
@@ -51,13 +50,13 @@ public class JpaRepositoryIntegrationTest {
                 .enabled(true)
                 .build();
 
-        CodeExecutionEntity saved = executionRepository.save(entity);
+        TestExecutionEntity saved = executionRepository.save(entity);
 
         // Check ID was generated
         assertThat(saved.getRegistrationId()).isNotNull();
 
         // Retrieve and verify
-        CodeExecutionEntity retrieved = executionRepository.findByRegistrationId(saved.getRegistrationId()).orElseThrow();
+        TestExecutionEntity retrieved = executionRepository.findByRegistrationId(saved.getRegistrationId()).orElseThrow();
         assertThat(retrieved.getRegistrationId()).isEqualTo(registrationId);
         assertThat(retrieved.getCommand()).isEqualTo("test-command");
         assertThat(retrieved.getWorkingDirectory()).isEqualTo("/tmp");
@@ -74,7 +73,7 @@ public class JpaRepositoryIntegrationTest {
     @Test
     void testCodeExecutionEntityUniqueConstraint() {
         // Create and save an entity
-        CodeExecutionEntity entity1 = CodeExecutionEntity.builder()
+        TestExecutionEntity entity1 = TestExecutionEntity.builder()
                 .registrationId(registrationId)
                 .command("test-command")
                 .workingDirectory("/tmp")
@@ -84,7 +83,7 @@ public class JpaRepositoryIntegrationTest {
         executionRepository.save(entity1);
 
         // Try to save another with the same registration ID
-        CodeExecutionEntity entity2 = CodeExecutionEntity.builder()
+        TestExecutionEntity entity2 = TestExecutionEntity.builder()
                 .registrationId(registrationId)  // Same ID
                 .command("another-command")
                 .enabled(true)
@@ -101,7 +100,7 @@ public class JpaRepositoryIntegrationTest {
     void testCodeExecutionHistoryPersistence() {
         // Create and save a history entry
         String executionId = UUID.randomUUID().toString();
-        CodeExecutionHistory history = CodeExecutionHistory.builder()
+        TestExecutionHistory history = TestExecutionHistory.builder()
                 .executionId(executionId)
                 .registrationId(registrationId)
                 .command("test-command")
@@ -112,13 +111,13 @@ public class JpaRepositoryIntegrationTest {
                 .executionTimeMs(150)
                 .build();
 
-        CodeExecutionHistory saved = historyRepository.save(history);
+        TestExecutionHistory saved = historyRepository.save(history);
 
         // Check ID was generated
         assertThat(saved.getRegistrationId()).isNotNull();
 
         // Retrieve and verify
-        CodeExecutionHistory retrieved = historyRepository.findByRegistrationId(saved.getRegistrationId()).getFirst();
+        TestExecutionHistory retrieved = historyRepository.findByRegistrationId(saved.getRegistrationId()).getFirst();
         assertThat(retrieved.getExecutionId()).isEqualTo(executionId);
         assertThat(retrieved.getRegistrationId()).isEqualTo(registrationId);
         assertThat(retrieved.getCommand()).isEqualTo("test-command");
@@ -137,7 +136,7 @@ public class JpaRepositoryIntegrationTest {
     void testFindTop10ByOrderByExecutedAtDesc() {
         // Create 15 history entries with varying execution times
         IntStream.range(0, 15).forEach(i -> {
-            CodeExecutionHistory history = CodeExecutionHistory.builder()
+            TestExecutionHistory history = TestExecutionHistory.builder()
                     .executionId(UUID.randomUUID().toString())
                     .registrationId(registrationId)
                     .command("command-" + i)
@@ -150,7 +149,7 @@ public class JpaRepositoryIntegrationTest {
         });
 
         // Find the top 10
-        List<CodeExecutionHistory> top10 = historyRepository.findTop10ByOrderByCreatedTimeDesc();
+        List<TestExecutionHistory> top10 = historyRepository.findTop10ByOrderByCreatedTimeDesc();
         
         // Verify we got at most 10 results
         assertThat(top10.size()).isLessThanOrEqualTo(10);
@@ -164,7 +163,7 @@ public class JpaRepositoryIntegrationTest {
         
         // Create 5 histories for regId1
         IntStream.range(0, 5).forEach(i -> {
-            CodeExecutionHistory history = CodeExecutionHistory.builder()
+            TestExecutionHistory history = TestExecutionHistory.builder()
                     .executionId(UUID.randomUUID().toString())
                     .registrationId(regId1)
                     .command("command-" + i)
@@ -177,7 +176,7 @@ public class JpaRepositoryIntegrationTest {
         
         // Create 3 histories for regId2
         IntStream.range(0, 3).forEach(i -> {
-            CodeExecutionHistory history = CodeExecutionHistory.builder()
+            TestExecutionHistory history = TestExecutionHistory.builder()
                     .executionId(UUID.randomUUID().toString())
                     .registrationId(regId2)
                     .command("other-command-" + i)
@@ -189,12 +188,12 @@ public class JpaRepositoryIntegrationTest {
         });
 
         // Find by first registration ID
-        List<CodeExecutionHistory> reg1Histories = historyRepository.findByRegistrationId(regId1);
+        List<TestExecutionHistory> reg1Histories = historyRepository.findByRegistrationId(regId1);
         assertThat(reg1Histories.size()).isEqualTo(5);
         assertThat(reg1Histories).allMatch(h -> h.getRegistrationId().equals(regId1));
         
         // Find by second registration ID
-        List<CodeExecutionHistory> reg2Histories = historyRepository.findByRegistrationId(regId2);
+        List<TestExecutionHistory> reg2Histories = historyRepository.findByRegistrationId(regId2);
         assertThat(reg2Histories.size()).isEqualTo(3);
         assertThat(reg2Histories).allMatch(h -> h.getRegistrationId().equals(regId2));
     }

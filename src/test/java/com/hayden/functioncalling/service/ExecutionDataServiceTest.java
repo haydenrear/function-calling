@@ -1,8 +1,8 @@
 package com.hayden.functioncalling.service;
 
-import com.hayden.functioncalling.entity.CodeExecutionHistory;
-import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
-import com.hayden.functioncalling.service.process_builder.ProcessBuilderExecutionDataService;
+import com.hayden.functioncalling.entity.TestExecutionHistory;
+import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
+import com.hayden.functioncalling.service.process_builder.ProcessBuilderDataService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,13 +20,13 @@ import static org.mockito.Mockito.*;
 public class ExecutionDataServiceTest {
 
     @Mock
-    private CodeExecutionHistoryRepository executionHistoryRepository;
+    private TestExecutionHistoryRepository executionHistoryRepository;
 
     @InjectMocks
-    private ProcessBuilderExecutionDataService executionDataService;
+    private ProcessBuilderDataService executionDataService;
 
     @Captor
-    private ArgumentCaptor<CodeExecutionHistory> historyCaptor;
+    private ArgumentCaptor<TestExecutionHistory> historyCaptor;
 
     @Test
     void testSaveExecutionHistory_Success() {
@@ -56,7 +56,7 @@ public class ExecutionDataServiceTest {
         // Then
         verify(executionHistoryRepository, times(1)).save(historyCaptor.capture());
 
-        CodeExecutionHistory savedHistory = historyCaptor.getValue();
+        TestExecutionHistory savedHistory = historyCaptor.getValue();
         assertThat(savedHistory.getExecutionId()).isEqualTo(executionId);
         assertThat(savedHistory.getCommand()).isEqualTo(command);
         assertThat(savedHistory.getArguments()).isEqualTo(arguments);
@@ -95,7 +95,7 @@ public class ExecutionDataServiceTest {
         // Then
         verify(executionHistoryRepository, times(1)).save(historyCaptor.capture());
 
-        CodeExecutionHistory savedHistory = historyCaptor.getValue();
+        TestExecutionHistory savedHistory = historyCaptor.getValue();
         assertThat(savedHistory.getExecutionId()).isEqualTo(executionId);
         assertThat(savedHistory.getCommand()).isEqualTo(command);
         assertThat(savedHistory.getArguments()).isEqualTo(arguments);

@@ -1,6 +1,6 @@
 package com.hayden.functioncalling.repository;
 
-import com.hayden.functioncalling.entity.CodeExecutionHistory;
+import com.hayden.functioncalling.entity.TestExecutionHistory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@Transactional
-public class CodeExecutionHistoryRepositoryTest {
+
+public class TestExecutionHistoryRepositoryTest {
 
     @Autowired
-    private CodeExecutionHistoryRepository repository;
+    private TestExecutionHistoryRepository repository;
 
     private String executionId;
     private String registrationId;
@@ -35,7 +34,7 @@ public class CodeExecutionHistoryRepositoryTest {
         registrationId = UUID.randomUUID().toString();
 
         // Create and save a test execution history
-        CodeExecutionHistory history = CodeExecutionHistory.builder()
+        TestExecutionHistory history = TestExecutionHistory.builder()
                 .executionId(executionId)
                 .registrationId(registrationId)
                 .command("echo")
@@ -50,7 +49,7 @@ public class CodeExecutionHistoryRepositoryTest {
 
         // Add more test data for finding recent executions
         for (int i = 0; i < 15; i++) {
-            CodeExecutionHistory additionalHistory = CodeExecutionHistory.builder()
+            TestExecutionHistory additionalHistory = TestExecutionHistory.builder()
                     .executionId(UUID.randomUUID().toString())
                     .registrationId(registrationId)
                     .command("test-command-" + i)
@@ -68,7 +67,7 @@ public class CodeExecutionHistoryRepositoryTest {
 
     @Test
     void testFindByExecutionId() {
-        Optional<CodeExecutionHistory> found = repository.findByExecutionId(executionId);
+        Optional<TestExecutionHistory> found = repository.findByExecutionId(executionId);
         
         assertThat(found).isPresent();
         assertThat(found.get().getExecutionId()).isEqualTo(executionId);
@@ -81,13 +80,13 @@ public class CodeExecutionHistoryRepositoryTest {
 
     @Test
     void testFindByNonexistentExecutionId() {
-        Optional<CodeExecutionHistory> found = repository.findByExecutionId("nonexistent-id");
+        Optional<TestExecutionHistory> found = repository.findByExecutionId("nonexistent-id");
         assertThat(found).isEmpty();
     }
 
     @Test
     void testFindByRegistrationId() {
-        List<CodeExecutionHistory> histories = repository.findByRegistrationId(registrationId);
+        List<TestExecutionHistory> histories = repository.findByRegistrationId(registrationId);
         
         assertThat(histories).isNotEmpty();
         assertThat(histories.size()).isEqualTo(16); // Our original plus the 15 added in setup
@@ -96,7 +95,7 @@ public class CodeExecutionHistoryRepositoryTest {
 
     @Test
     void testFindTop10ByOrderByExecutedAtDesc() {
-        List<CodeExecutionHistory> recentExecutions = repository.findTop10ByOrderByCreatedTimeDesc();
+        List<TestExecutionHistory> recentExecutions = repository.findTop10ByOrderByCreatedTimeDesc();
         
         assertThat(recentExecutions).isNotEmpty();
         assertThat(recentExecutions.size()).isLessThanOrEqualTo(10);
@@ -119,7 +118,7 @@ public class CodeExecutionHistoryRepositoryTest {
     void testSaveAndDelete() {
         // Create a new history entry
         String newExecutionId = UUID.randomUUID().toString();
-        CodeExecutionHistory newHistory = CodeExecutionHistory.builder()
+        TestExecutionHistory newHistory = TestExecutionHistory.builder()
                 .executionId(newExecutionId)
                 .registrationId(registrationId)
                 .command("test-command")
@@ -131,11 +130,11 @@ public class CodeExecutionHistoryRepositoryTest {
                 .build();
 
         // Save it
-        CodeExecutionHistory savedHistory = repository.save(newHistory);
+        TestExecutionHistory savedHistory = repository.save(newHistory);
         assertThat(savedHistory.getRegistrationId()).isNotNull();
         
         // Verify it can be found
-        Optional<CodeExecutionHistory> found = repository.findByExecutionId(newExecutionId);
+        Optional<TestExecutionHistory> found = repository.findByExecutionId(newExecutionId);
         assertThat(found).isPresent();
         
         // Delete it
@@ -147,7 +146,7 @@ public class CodeExecutionHistoryRepositoryTest {
 
     @Test
     void testFindAll() {
-        List<CodeExecutionHistory> allHistories = repository.findAll();
+        List<TestExecutionHistory> allHistories = repository.findAll();
         assertThat(allHistories.size()).isGreaterThanOrEqualTo(16); // At least our test data
     }
 }

@@ -2,10 +2,10 @@ package com.hayden.functioncalling.runner.process_builder;
 
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionOptions;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionResult;
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
-import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
-import com.hayden.functioncalling.repository.CodeExecutionRepository;
-import com.hayden.functioncalling.service.process_builder.ProcessBuilderExecutionDataService;
+import com.hayden.functioncalling.entity.TestExecutionEntity;
+import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
+import com.hayden.functioncalling.repository.TestExecutionRepository;
+import com.hayden.functioncalling.service.process_builder.ProcessBuilderDataService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,13 +33,13 @@ public class ProcessBuilderExecRunnerTest {
     private ProcessBuilderExecRunner execRunner;
 
     @Autowired
-    private CodeExecutionRepository executionRepository;
+    private TestExecutionRepository executionRepository;
 
     @Autowired
-    private CodeExecutionHistoryRepository historyRepository;
+    private TestExecutionHistoryRepository historyRepository;
 
     @Autowired
-    private ProcessBuilderExecutionDataService executionDataService;
+    private ProcessBuilderDataService executionDataService;
 
     private String registrationId;
 
@@ -47,7 +47,7 @@ public class ProcessBuilderExecRunnerTest {
     void setUp() {
         // Create a test code execution registration
         registrationId = UUID.randomUUID().toString();
-        CodeExecutionEntity entity = CodeExecutionEntity.builder()
+        TestExecutionEntity entity = TestExecutionEntity.builder()
                 .registrationId(registrationId)
                 .command("echo")
                 .arguments("Hello World")
@@ -96,10 +96,10 @@ public class ProcessBuilderExecRunnerTest {
     @Test
     void testRunWithDisabledRegistration() {
         // Disable the registration
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         assertTrue(entityOpt.isPresent());
         
-        CodeExecutionEntity entity = entityOpt.get();
+        TestExecutionEntity entity = entityOpt.get();
         entity.setEnabled(false);
         executionRepository.save(entity);
 
@@ -159,10 +159,10 @@ public class ProcessBuilderExecRunnerTest {
     @Test
     void testRunWithTimeout() {
         // First modify the registration to use a long-running command
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         assertTrue(entityOpt.isPresent());
         
-        CodeExecutionEntity entity = entityOpt.get();
+        TestExecutionEntity entity = entityOpt.get();
         entity.setCommand("sleep");
         entity.setArguments("10");  // Sleep for 10 seconds
         entity.setTimeoutSeconds(1); // But timeout after 1 second
@@ -187,10 +187,10 @@ public class ProcessBuilderExecRunnerTest {
     @Test
     void testRunNonZeroExitCode() {
         // Modify the registration to use a command that will fail
-        Optional<CodeExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         assertTrue(entityOpt.isPresent());
         
-        CodeExecutionEntity entity = entityOpt.get();
+        TestExecutionEntity entity = entityOpt.get();
         entity.setCommand("ls");
         entity.setArguments("/nonexistentdirectory");  // This should fail with exit code 1 or 2
         executionRepository.save(entity);

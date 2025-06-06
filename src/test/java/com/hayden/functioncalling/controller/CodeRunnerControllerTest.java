@@ -5,10 +5,10 @@ import com.hayden.commitdiffmodel.codegen.types.CodeExecutionOptions;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionRegistration;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionRegistrationIn;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionResult;
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
-import com.hayden.functioncalling.entity.CodeExecutionHistory;
-import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
-import com.hayden.functioncalling.repository.CodeExecutionRepository;
+import com.hayden.functioncalling.entity.TestExecutionEntity;
+import com.hayden.functioncalling.entity.TestExecutionHistory;
+import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
+import com.hayden.functioncalling.repository.TestExecutionRepository;
 import com.hayden.functioncalling.runner.ExecRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,17 +26,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@Transactional
 public class CodeRunnerControllerTest {
 
     @Autowired
     private CodeRunnerController controller;
 
     @Autowired
-    private CodeExecutionRepository executionRepository;
+    private TestExecutionRepository executionRepository;
 
     @Autowired
-    private CodeExecutionHistoryRepository historyRepository;
+    private TestExecutionHistoryRepository historyRepository;
 
     @Autowired
     private ExecRunner execRunner;
@@ -50,7 +47,7 @@ public class CodeRunnerControllerTest {
     void setUp() {
         // Create a test code execution registration
         registrationId = UUID.randomUUID().toString();
-        CodeExecutionEntity entity = CodeExecutionEntity.builder()
+        TestExecutionEntity entity = TestExecutionEntity.builder()
                 .registrationId(registrationId)
                 .command("echo")
                 .arguments("Hello World")
@@ -63,7 +60,7 @@ public class CodeRunnerControllerTest {
         executionRepository.save(entity);
 
         // Create some test execution history
-        CodeExecutionHistory history = CodeExecutionHistory.builder()
+        TestExecutionHistory history = TestExecutionHistory.builder()
                 .executionId(UUID.randomUUID().toString())
                 .registrationId(registrationId)
                 .command("echo")
@@ -77,7 +74,7 @@ public class CodeRunnerControllerTest {
         historyRepository.save(history);
 
         cdcAgentsTest = UUID.randomUUID().toString();
-        CodeExecutionEntity runCdcAgentsDockerTest = CodeExecutionEntity.builder()
+        TestExecutionEntity runCdcAgentsDockerTest = TestExecutionEntity.builder()
                 .registrationId(cdcAgentsTest)
                 .command("uv")
                 .arguments("run test-cdc-agents")
@@ -160,7 +157,7 @@ public class CodeRunnerControllerTest {
         assertThat(result.getTimeoutSeconds()).isEqualTo(20);
         
         // Verify the database was updated
-        CodeExecutionEntity entity = executionRepository.findByRegistrationId(registrationId).orElseThrow();
+        TestExecutionEntity entity = executionRepository.findByRegistrationId(registrationId).orElseThrow();
         assertThat(entity.getCommand()).isEqualTo("ls");
         assertThat(entity.getArguments()).isEqualTo("-la");
         assertThat(entity.getTimeoutSeconds()).isEqualTo(20);

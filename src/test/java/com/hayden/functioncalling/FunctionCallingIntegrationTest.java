@@ -5,10 +5,9 @@ import com.hayden.commitdiffmodel.codegen.types.CodeExecutionRegistration;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionRegistrationIn;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionResult;
 import com.hayden.functioncalling.controller.CodeRunnerController;
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
-import com.hayden.functioncalling.entity.CodeExecutionHistory;
-import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
-import com.hayden.functioncalling.repository.CodeExecutionRepository;
+import com.hayden.functioncalling.entity.TestExecutionHistory;
+import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
+import com.hayden.functioncalling.repository.TestExecutionRepository;
 import com.hayden.functioncalling.runner.ExecRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -36,10 +33,10 @@ public class FunctionCallingIntegrationTest {
     private CodeRunnerController controller;
     
     @Autowired
-    private CodeExecutionRepository executionRepository;
+    private TestExecutionRepository executionRepository;
     
     @Autowired
-    private CodeExecutionHistoryRepository historyRepository;
+    private TestExecutionHistoryRepository historyRepository;
     
     @Autowired
     private ExecRunner execRunner;
@@ -59,7 +56,7 @@ public class FunctionCallingIntegrationTest {
     }
     
     @Test
-    @Transactional
+
     public void testCompleteExecutionFlow() throws Exception {
         // 1. Register a command
         String registrationId = UUID.randomUUID().toString();
@@ -144,7 +141,6 @@ public class FunctionCallingIntegrationTest {
     }
     
     @Test
-    @Transactional
     public void testFailedExecution() {
         // 1. Register a command that will fail
         String registrationId = UUID.randomUUID().toString();
@@ -175,7 +171,7 @@ public class FunctionCallingIntegrationTest {
         
         // 4. Check the history was recorded
         String executionId = result.getExecutionId();
-        CodeExecutionHistory history = historyRepository.findByExecutionId(executionId).orElse(null);
+        TestExecutionHistory history = historyRepository.findByExecutionId(executionId).orElse(null);
         assertThat(history).isNotNull();
         assertThat(history.getSuccess()).isFalse();
     }

@@ -1,6 +1,6 @@
 package com.hayden.functioncalling.repository;
 
-import com.hayden.functioncalling.entity.CodeExecutionEntity;
+import com.hayden.functioncalling.entity.TestExecutionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@Transactional
-public class CodeExecutionRepositoryTest {
+
+public class TestExecutionRepositoryTest {
 
     @Autowired
-    private CodeExecutionRepository repository;
+    private TestExecutionRepository repository;
 
     private String registrationId;
 
@@ -31,7 +30,7 @@ public class CodeExecutionRepositoryTest {
     void setUp() {
         registrationId = UUID.randomUUID().toString();
 
-        CodeExecutionEntity entity = CodeExecutionEntity.builder()
+        TestExecutionEntity entity = TestExecutionEntity.builder()
                 .registrationId(registrationId)
                 .command("echo")
                 .arguments("Hello World")
@@ -44,7 +43,7 @@ public class CodeExecutionRepositoryTest {
         repository.save(entity);
 
         // Add a disabled entity
-        CodeExecutionEntity disabledEntity = CodeExecutionEntity.builder()
+        TestExecutionEntity disabledEntity = TestExecutionEntity.builder()
                 .registrationId(UUID.randomUUID().toString())
                 .command("ls")
                 .arguments("-la")
@@ -59,14 +58,14 @@ public class CodeExecutionRepositoryTest {
 
     @Test
     void testFindByRegistrationId() {
-        Optional<CodeExecutionEntity> found = repository.findByRegistrationId(registrationId);
+        Optional<TestExecutionEntity> found = repository.findByRegistrationId(registrationId);
         assertThat(found).isPresent();
         assertThat(found.get().getRegistrationId()).isEqualTo(registrationId);
     }
 
     @Test
     void testFindByEnabledTrue() {
-        List<CodeExecutionEntity> enabledEntities = repository.findByEnabledTrue();
+        List<TestExecutionEntity> enabledEntities = repository.findByEnabledTrue();
         assertThat(enabledEntities).isNotEmpty();
         assertThat(enabledEntities).allMatch(entity -> entity.getEnabled());
     }
@@ -84,7 +83,7 @@ public class CodeExecutionRepositoryTest {
     void testSaveAndDelete() {
         // Create a new entity
         String newId = UUID.randomUUID().toString();
-        CodeExecutionEntity newEntity = CodeExecutionEntity.builder()
+        TestExecutionEntity newEntity = TestExecutionEntity.builder()
                 .registrationId(newId)
                 .command("grep")
                 .arguments("pattern file")
@@ -95,7 +94,7 @@ public class CodeExecutionRepositoryTest {
                 .build();
 
         // Save it
-        CodeExecutionEntity savedEntity = repository.save(newEntity);
+        TestExecutionEntity savedEntity = repository.save(newEntity);
         assertThat(savedEntity.getRegistrationId()).isNotNull();
         
         // Verify it can be found
@@ -110,14 +109,14 @@ public class CodeExecutionRepositoryTest {
 
     @Test
     void testFindAll() {
-        List<CodeExecutionEntity> allEntities = repository.findAll();
+        List<TestExecutionEntity> allEntities = repository.findAll();
         assertThat(allEntities.size()).isGreaterThanOrEqualTo(2); // At least our two test entities
     }
 
     @Test
     void testUpdateEntity() {
         // Get the entity
-        CodeExecutionEntity entity = repository.findByRegistrationId(registrationId).orElseThrow();
+        TestExecutionEntity entity = repository.findByRegistrationId(registrationId).orElseThrow();
         
         // Update it
         entity.setCommand("updated-command");
@@ -128,7 +127,7 @@ public class CodeExecutionRepositoryTest {
         repository.save(entity);
         
         // Retrieve it again and verify updates
-        CodeExecutionEntity updated = repository.findByRegistrationId(registrationId).orElseThrow();
+        TestExecutionEntity updated = repository.findByRegistrationId(registrationId).orElseThrow();
         assertThat(updated.getCommand()).isEqualTo("updated-command");
         assertThat(updated.getArguments()).isEqualTo("updated-args");
         assertThat(updated.getTimeoutSeconds()).isEqualTo(60);
