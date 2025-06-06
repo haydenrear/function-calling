@@ -1,4 +1,4 @@
-package com.hayden.functioncalling.service;
+package com.hayden.functioncalling.service.process_builder;
 
 import com.hayden.functioncalling.entity.CodeExecutionHistory;
 import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ExecutionDataService {
+public class ProcessBuilderExecutionDataService {
 
     private final CodeExecutionHistoryRepository executionHistoryRepository;
 

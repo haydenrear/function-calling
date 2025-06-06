@@ -1,11 +1,11 @@
-package com.hayden.functioncalling.runner.process_builder_docker;
+package com.hayden.functioncalling.runner.process_builder;
 
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionOptions;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionResult;
 import com.hayden.functioncalling.entity.CodeExecutionEntity;
 import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
 import com.hayden.functioncalling.repository.CodeExecutionRepository;
-import com.hayden.functioncalling.service.ExecutionDataService;
+import com.hayden.functioncalling.service.process_builder.ProcessBuilderExecutionDataService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -40,7 +39,7 @@ public class ProcessBuilderExecRunnerTest {
     private CodeExecutionHistoryRepository historyRepository;
 
     @Autowired
-    private ExecutionDataService executionDataService;
+    private ProcessBuilderExecutionDataService executionDataService;
 
     private String registrationId;
 

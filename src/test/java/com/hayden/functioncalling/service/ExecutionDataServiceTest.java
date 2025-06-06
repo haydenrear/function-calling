@@ -2,6 +2,7 @@ package com.hayden.functioncalling.service;
 
 import com.hayden.functioncalling.entity.CodeExecutionHistory;
 import com.hayden.functioncalling.repository.CodeExecutionHistoryRepository;
+import com.hayden.functioncalling.service.process_builder.ProcessBuilderExecutionDataService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,7 +23,7 @@ public class ExecutionDataServiceTest {
     private CodeExecutionHistoryRepository executionHistoryRepository;
 
     @InjectMocks
-    private ExecutionDataService executionDataService;
+    private ProcessBuilderExecutionDataService executionDataService;
 
     @Captor
     private ArgumentCaptor<CodeExecutionHistory> historyCaptor;
