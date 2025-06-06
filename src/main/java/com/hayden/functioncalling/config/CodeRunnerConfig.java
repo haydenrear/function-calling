@@ -12,6 +12,8 @@ import com.hayden.persistence.lock.AdvisoryLock;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import com.hayden.persistence.lock.WithPgAdvisoryAspect;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +23,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Slf4j
-@Import(AdvisoryLock.class)
+@Import({AdvisoryLock.class, WithPgAdvisoryAspect.class})
 public class CodeRunnerConfig {
 
     @Bean
