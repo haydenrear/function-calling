@@ -1,6 +1,6 @@
 package com.hayden.functioncalling.config;
 
-import com.hayden.commitdiffmodel.convert.CommitDiffContextMapper;
+import com.hayden.commitdiffcontext.convert.CommitDiffContextMapper;
 import com.hayden.functioncalling.entity.CodeBuildEntity;
 import com.hayden.functioncalling.entity.CodeDeployEntity;
 import com.hayden.functioncalling.entity.TestExecutionEntity;

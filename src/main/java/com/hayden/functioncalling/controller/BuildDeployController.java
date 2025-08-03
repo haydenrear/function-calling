@@ -2,7 +2,7 @@ package com.hayden.functioncalling.controller;
 
 import com.hayden.commitdiffmodel.codegen.types.*;
 import com.hayden.commitdiffmodel.codegen.types.Error;
-import com.hayden.commitdiffmodel.convert.CommitDiffContextMapper;
+import com.hayden.commitdiffcontext.convert.CommitDiffContextMapper;
 import com.hayden.functioncalling.entity.CodeBuildEntity;
 import com.hayden.functioncalling.entity.CodeBuildHistory;
 import com.hayden.functioncalling.entity.CodeDeployEntity;
@@ -19,7 +19,6 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;

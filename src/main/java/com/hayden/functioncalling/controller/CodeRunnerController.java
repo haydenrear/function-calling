@@ -2,7 +2,7 @@ package com.hayden.functioncalling.controller;
 
 import com.hayden.commitdiffmodel.codegen.types.*;
 import com.hayden.commitdiffmodel.codegen.types.Error;
-import com.hayden.commitdiffmodel.convert.CommitDiffContextMapper;
+import com.hayden.commitdiffcontext.convert.CommitDiffContextMapper;
 import com.hayden.functioncalling.entity.TestExecutionEntity;
 import com.hayden.functioncalling.entity.TestExecutionHistory;
 import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
