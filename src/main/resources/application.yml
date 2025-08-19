@@ -1,6 +1,10 @@
 
 spring.application.name: function-calling
 spring:
+  session:
+    jdbc:
+      schema: classpath:db-schema/schema-postgresql.sql
+      initialize-schema: always
   docker:
     compose:
       enabled: true

@@ -247,7 +247,10 @@ public class ProcessBuilderExecutionService {
         }
     }
 
-    private @NotNull Thread execThread(ProcessExecutionRequest request, BufferedReader reader, StringBuilder fullLog, StringBuilder output) {
+    private @NotNull Thread execThread(ProcessExecutionRequest request,
+                                       BufferedReader reader,
+                                       StringBuilder fullLog,
+                                       StringBuilder output) {
         Thread outputThread = new Thread(() -> {
             try {
                 String line;
