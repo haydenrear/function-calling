@@ -1,5 +1,5 @@
-
 spring.application.name: function-calling
+
 spring:
   session:
     jdbc:
@@ -7,13 +7,7 @@ spring:
       initialize-schema: always
   docker:
     compose:
-      enabled: true
-      file: src/main/docker/docker-compose.yml
-      lifecycle-management: start_only
-      readiness:
-        wait: never
-      skip:
-        in-tests: false
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: create
@@ -21,7 +15,7 @@ spring:
     show-sql: true
     database: postgresql
   datasource:
-    url: jdbc:postgresql://localhost:5440/postgres
+    url: jdbc:postgresql://${PG_HOST:localhost}:5401/postgres
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
@@ -29,7 +23,7 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: postgres
-      jdbc-url: jdbc:postgresql://localhost:5440/postgres
+      jdbc-url: jdbc:postgresql://${PG_HOST:localhost}:5401/postgres
   liquibase:
     enabled: false
   cloud:
@@ -68,10 +62,28 @@ logging:
   level:
     org.springframework.boot: INFO
 
-
-
 spring.ai.vectorstore.type: none
 
 endpoints:
   zookeeper:
     enabled: false
+
+otel:
+  instrumentation:
+    spring-web:
+      enabled: false
+    spring-webmvc:
+      enabled: false
+    spring-webflux:
+      enabled: false
+    jdbc:
+      enabled: false
+    kafka:
+      enabled: false
+    mongo:
+      enabled: false
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false

@@ -5,14 +5,14 @@ spring:
     compose:
       enabled: true
       file: src/main/docker/docker-compose.yml
-      lifecycle-management: start_only
+      lifecycle-management: start_and_stop
       readiness:
         wait: never
       skip:
         in-tests: false
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
       format_sql: true
     show-sql: true
   datasource:

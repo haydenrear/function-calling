@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CodeBuildRepository extends JpaRepository<CodeBuildEntity, Long> {
+public interface CodeBuildRepository extends JpaRepository<CodeBuildEntity, String> {
 
     Optional<CodeBuildEntity> findByRegistrationId(String registrationId);
 

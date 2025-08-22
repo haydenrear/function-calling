@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -212,7 +213,7 @@ public class ProcessBuilderExecutionService {
                 .error(error)
                 .exitCode(exitCode)
                 .executionTimeMs(executionTimeMs)
-                .logPath(request.getOutputFile().toPath())
+                .logPath(Optional.ofNullable(request.getOutputFile()).map(File::toPath).orElse(null))
                 .process(process)
                 .build();
     }

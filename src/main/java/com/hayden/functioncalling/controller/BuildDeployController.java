@@ -1,5 +1,6 @@
 package com.hayden.functioncalling.controller;
 
+import com.google.common.collect.Lists;
 import com.hayden.commitdiffcontext.convert.CommitDiffContextMapper;
 import com.hayden.commitdiffmodel.codegen.types.*;
 import com.hayden.commitdiffmodel.codegen.types.Error;
@@ -60,7 +61,12 @@ public class BuildDeployController {
     @DgsQuery
     public CodeBuildRegistration getCodeBuildRegistration(@InputArgument String registrationId) {
         Optional<CodeBuildEntity> entity = buildRepository.findByRegistrationId(registrationId);
-        return entity.map(this::mapToBuildRegistration).orElse(null);
+        return entity.map(this::mapToBuildRegistration)
+                .orElse(
+                        CodeBuildRegistration
+                                .newBuilder()
+                                .error(Lists.newArrayList(Error.newBuilder().message("CodeBuildRegistration with registration ID %s does not exist.".formatted(registrationId)).build()))
+                                .build());
     }
 
     @DgsQuery
@@ -172,6 +178,8 @@ public class BuildDeployController {
     @DgsMutation
     public CodeBuildRegistration registerCodeBuild(@InputArgument CodeBuildRegistrationIn codeBuildRegistration) {
         CodeBuildEntity entity = mapper.map(codeBuildRegistration, CodeBuildEntity.class);
+
+        buildRepository.deleteById(entity.getRegistrationId());
 
         entity = buildRepository.save(entity);
         log.info("Registered new code build: {}", entity.getRegistrationId());

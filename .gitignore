@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+
 ### STS ###
 .apt_generated
 .classpath
@@ -38,4 +39,3 @@ out/
 out/**
 target
 bin/*
-test_work/*
