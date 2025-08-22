@@ -3,12 +3,15 @@ package com.hayden.functioncalling.service.process_builder;
 import lombok.Builder;
 import lombok.Data;
 
+import java.nio.file.Path;
+
 @Data
 @Builder
 public class ProcessExecutionResult {
     private boolean success;
     private String output;
     private String fullLog;
+    private Path logPath;
     private String error;
     private int exitCode;
     private int executionTimeMs;

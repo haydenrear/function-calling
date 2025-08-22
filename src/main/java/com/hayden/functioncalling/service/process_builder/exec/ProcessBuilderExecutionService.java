@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -211,6 +212,7 @@ public class ProcessBuilderExecutionService {
                 .error(error)
                 .exitCode(exitCode)
                 .executionTimeMs(executionTimeMs)
+                .logPath(request.getOutputFile().toPath())
                 .process(process)
                 .build();
     }

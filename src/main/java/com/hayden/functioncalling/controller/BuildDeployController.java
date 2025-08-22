@@ -170,7 +170,6 @@ public class BuildDeployController {
 
     // Build Mutations
     @DgsMutation
-    
     public CodeBuildRegistration registerCodeBuild(@InputArgument CodeBuildRegistrationIn codeBuildRegistration) {
         CodeBuildEntity entity = mapper.map(codeBuildRegistration, CodeBuildEntity.class);
 
@@ -181,7 +180,6 @@ public class BuildDeployController {
     }
 
     @DgsMutation
-    
     public CodeBuildRegistration updateCodeBuildRegistration(
             @InputArgument String registrationId,
             @InputArgument Boolean enabled,
@@ -227,7 +225,6 @@ public class BuildDeployController {
     }
 
     @DgsMutation
-    
     public Boolean deleteCodeBuildRegistration(@InputArgument String registrationId, @InputArgument String sessionId) {
         Optional<CodeBuildEntity> entityOpt = buildRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
