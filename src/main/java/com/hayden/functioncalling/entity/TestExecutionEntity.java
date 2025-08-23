@@ -1,6 +1,7 @@
 package com.hayden.functioncalling.entity;
 
 import com.hayden.commitdiffmodel.codegen.types.ExecutionType;
+import com.hayden.persistence.models.AuditedEntity;
 import com.hayden.persistence.models.JpaHibernateAuditedIded;
 import jakarta.persistence.*;
 import java.util.List;
@@ -13,9 +14,10 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TestExecutionEntity extends JpaHibernateAuditedIded {
+public class TestExecutionEntity extends AuditedEntity<String> {
 
-    @Column(nullable = false, unique = true)
+    @Id
+    @org.springframework.data.annotation.Id
     private String registrationId;
 
     @Column(nullable = false)
@@ -52,4 +54,9 @@ public class TestExecutionEntity extends JpaHibernateAuditedIded {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private ExecutionType executionType = ExecutionType.PROCESS_BUILDER;
+
+    @Override
+    public String equalsAndHashCodeId() {
+        return registrationId;
+    }
 }

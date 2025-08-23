@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TestExecutionRepository extends JpaRepository<TestExecutionEntity, Long> {
+public interface TestExecutionRepository extends JpaRepository<TestExecutionEntity, String> {
     
     Optional<TestExecutionEntity> findByRegistrationId(String registrationId);
     
