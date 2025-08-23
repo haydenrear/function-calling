@@ -261,9 +261,7 @@ public class BuildDeployController {
         return buildExecRunner.build(options);
     }
 
-    // Deploy Mutations
     @DgsMutation
-    
     public CodeDeployRegistration registerCodeDeploy(@InputArgument CodeDeployRegistrationIn codeDeployRegistration) {
         CodeDeployEntity entity = mapper.map(codeDeployRegistration, CodeDeployEntity.class);
 
@@ -274,7 +272,6 @@ public class BuildDeployController {
     }
 
     @DgsMutation
-    
     public CodeDeployRegistration updateCodeDeployRegistration(
             @InputArgument String registrationId,
             @InputArgument Boolean enabled,

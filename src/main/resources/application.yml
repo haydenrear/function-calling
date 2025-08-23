@@ -8,6 +8,12 @@ spring:
   docker:
     compose:
       enabled: false
+      file: classpath:docker/docker-compose.yml
+      lifecycle-management: start_only
+      readiness:
+        wait: always
+      skip:
+        in-tests: false
   jpa:
     hibernate:
       ddl-auto: create
