@@ -7,19 +7,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class AsyncConfig {
 
     @Bean
-    public ThreadPoolTaskExecutor runnerTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(25);
-        executor.setThreadNamePrefix("CodeExec-");
-        executor.initialize();
-        return executor;
+    public ExecutorService runnerTaskExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 
     @Bean

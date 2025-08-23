@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -26,7 +23,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class ProcessBuilderExecutionService {
 
-    private final ThreadPoolTaskExecutor runnerTaskExecutor;
+    private final ExecutorService runnerTaskExecutor;
 
     public ProcessExecutionResult executeProcess(ProcessExecutionRequest request) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
@@ -50,9 +47,9 @@ public class ProcessBuilderExecutionService {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         // Start a thread to read the process output
-        Thread outputThread = execThread(request, reader, fullLog, output);
+        var outputThread = execThread(request, reader, fullLog, output);
 
-        CompletableFuture<Void> outputFuture = runnerTaskExecutor.submitCompletable(outputThread);
+        CompletableFuture<Void> outputFuture = CompletableFuture.runAsync(outputThread, runnerTaskExecutor);
 
         // Wait for the process to complete
         boolean completed = waitForProcess(process, request.getTimeoutSeconds());
@@ -147,9 +144,9 @@ public class ProcessBuilderExecutionService {
 
         String error = null;
 
-        Thread outputThread = execThread(request, reader, fullLog, output);
+        var outputThread = execThread(request, reader, fullLog, output);
 
-        CompletableFuture<Void> outputFuture = runnerTaskExecutor.submitCompletable(outputThread);
+        CompletableFuture<Void> outputFuture = CompletableFuture.runAsync(outputThread, runnerTaskExecutor);
 
         int maxWaitSeconds = request.numWaitSeconds();
 
@@ -251,16 +248,14 @@ public class ProcessBuilderExecutionService {
         }
     }
 
-    private @NotNull Thread execThread(ProcessExecutionRequest request,
+    private @NotNull Runnable execThread(ProcessExecutionRequest request,
                                        BufferedReader reader,
                                        StringBuilder fullLog,
                                        StringBuilder output) {
-        Thread outputThread = new Thread(() -> {
+        return () -> {
             try {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    fullLog.append(line).append("\n");
-
                     if (request.getOutputRegex() != null && !request.getOutputRegex().isEmpty()) {
                         String finalLine = line;
                         if (request.getOutputRegex().stream().anyMatch(finalLine::matches)) {
@@ -270,15 +265,15 @@ public class ProcessBuilderExecutionService {
                         output.append(line).append("\n");
                     }
 
-                    if (request.getOutputFile() != null) {
+                    if (request.getOutputFile() == null)
+                        fullLog.append(line).append("\n");
+                    else
                         writeToFile(request.getOutputFile(), line + "\n");
-                    }
                 }
             } catch (IOException e) {
                 log.error("Error reading process output", e);
             }
-        });
-        return outputThread;
+        };
     }
 
     private List<String> buildCommandParts(String command, String arguments) {
