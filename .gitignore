@@ -41,3 +41,4 @@ target
 bin/*
 
 test_work/**
+*.jar
