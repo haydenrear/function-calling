@@ -6,7 +6,7 @@ import lombok.Data;
 import java.nio.file.Path;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class ProcessExecutionResult {
     private boolean success;
     private String output;

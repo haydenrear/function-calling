@@ -117,6 +117,7 @@ public class ProcessBuilderExecutionService {
                 .output(output.toString())
                 .fullLog(fullLog.toString())
                 .error(error)
+                .logPath(Optional.ofNullable(request.getOutputFile()).map(File::toPath).orElse(null))
                 .exitCode(exitCode)
                 .executionTimeMs(executionTimeMs)
                 .process(process)

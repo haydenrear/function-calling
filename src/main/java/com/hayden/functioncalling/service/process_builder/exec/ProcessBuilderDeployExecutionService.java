@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -105,6 +107,8 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
         Integer healthCheckResponseTime = null;
         String deploymentUrl = null;
 
+        var logOrFile = toLogOrFile(result);
+
         if (result.isSuccess() && StringUtils.isNotBlank(entity.getHealthCheckUrl())) {
             var healthCheck = performHealthCheck(entity);
             healthCheckStatus = healthCheck.status;
@@ -112,7 +116,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
             deploymentUrl = entity.getHealthCheckUrl();
 
             if (!"HEALTHY".equals(healthCheckStatus)) {
-                result = ProcessExecutionResult.builder()
+                result = result.toBuilder()
                         .success(false)
                         .output(result.getOutput())
                         .fullLog(result.getFullLog())
@@ -136,7 +140,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 result.getExitCode(),
                 result.getExecutionTimeMs(),
                 options.getSessionId(),
-                result.getFullLog(),
+                logOrFile,
                 healthCheckStatus,
                 healthCheckResponseTime,
                 result.getProcess() != null && result.getProcess().isAlive(),
@@ -152,12 +156,19 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 .executionTime(result.getExecutionTimeMs())
                 .deployId(deployId)
                 .error(List.of(new Error(result.getError())))
-                .deployLog(result.getFullLog())
+                .deployLog(logOrFile)
                 .healthCheckStatus(healthCheckStatus)
                 .healthCheckResponseTime(healthCheckResponseTime)
                 .isRunning(result.getProcess() != null && result.getProcess().isAlive())
                 .deploymentUrl(deploymentUrl)
                 .build();
+    }
+
+    private static String toLogOrFile(ProcessExecutionResult result) {
+        var logOrFile = Optional.ofNullable(result.getLogPath())
+                .map(Path::toString)
+                .orElse(result.getFullLog());
+        return logOrFile;
     }
 
     public CodeDeployResult executeStopCommand(CodeDeployEntity entity, String sessionId) throws Exception {
@@ -171,6 +182,8 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
 
         ProcessExecutionResult result = processBuilderService.executeProcess(request);
 
+        var log = toLogOrFile(result);
+
         // Save deploy history for stop operation
         deployDataService.saveDeployHistory(
                 entity.getRegistrationId(),
@@ -183,7 +196,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 result.getExitCode(),
                 result.getExecutionTimeMs(),
                 sessionId,
-                result.getFullLog(),
+                log,
                 "STOPPED",
                 null,
                 false,
@@ -199,7 +212,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 .executionTime(result.getExecutionTimeMs())
                 .deployId(deployId)
                 .error(List.of(new Error(result.getError())))
-                .deployLog(result.getFullLog())
+                .deployLog(log)
                 .healthCheckStatus("STOPPED")
                 .isRunning(false)
                 .build();

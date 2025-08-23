@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -88,6 +89,7 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
         }
 
         // Save build history
+        String buildLog = Optional.ofNullable(result.getLogPath()).map(Path::toString).orElse(result.getFullLog());
         buildDataService.saveBuildHistory(
                 entity.getRegistrationId(),
                 buildId,
@@ -101,8 +103,7 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
                 options.getSessionId(),
                 copiedArtifacts,
                 entity.getArtifactOutputDirectory(),
-                result.getFullLog()
-        );
+                buildLog);
 
         return CodeBuildResult.newBuilder()
                 .registrationId(options.getRegistrationId())
@@ -115,7 +116,7 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
                 .error(List.of(new Error(result.getError())))
                 .artifactPaths(copiedArtifacts)
                 .artifactOutputDirectory(entity.getArtifactOutputDirectory())
-                .buildLog(result.getFullLog())
+                .buildLog(buildLog)
                 .build();
     }
 
