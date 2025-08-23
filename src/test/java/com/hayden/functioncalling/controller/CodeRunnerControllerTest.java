@@ -118,6 +118,37 @@ public class CodeRunnerControllerTest {
     }
 
     @Test
+    void testBuildGradle() {
+        String newRegId = UUID.randomUUID().toString();
+        CodeExecutionRegistrationIn regIn = CodeExecutionRegistrationIn.newBuilder()
+                .registrationId(newRegId)
+                .command("bash")
+                .arguments("gradlew commit-diff-context-mcp:build -x test")
+                .workingDirectory("/Users/hayde/IdeaProjects/commit-diff-context-parent")
+                .enabled(true)
+                .description("run gradle")
+                .timeoutSeconds(5)
+                .build();
+
+        CodeExecutionRegistration result = controller.registerCodeExecution(regIn);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getRegistrationId()).isEqualTo(newRegId);
+        assertThat(result.getCommand()).isEqualTo("bash");
+
+        // Verify it was saved to the database
+        assertThat(executionRepository.findByRegistrationId(newRegId)).isPresent();
+        CodeExecutionOptions options = CodeExecutionOptions.newBuilder()
+                .registrationId(result.getRegistrationId())
+                .build();
+
+        CodeExecutionResult x = controller.execute(options);
+
+        assertThat(x).isNotNull();
+        assertThat(x.getSuccess()).isTrue();
+    }
+
+    @Test
     void testRegisterCodeExecution() {
         String newRegId = UUID.randomUUID().toString();
         CodeExecutionRegistrationIn regIn = CodeExecutionRegistrationIn.newBuilder()

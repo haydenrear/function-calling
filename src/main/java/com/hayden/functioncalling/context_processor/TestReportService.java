@@ -1,7 +1,6 @@
-package com.hayden.functioncalling.service.process_builder;
+package com.hayden.functioncalling.context_processor;
 
 import com.hayden.functioncalling.utils.TestResultsProcessor;
-import com.hayden.persistence.lock.AdvisoryLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class TestReportService {
      * @param reportPath Path to the test report directory
      * @return Formatted failure information
      */
-    public String getFailureContext(String reportPath, String sessionId, String runnerCopyPath) {
+    public String getContext(String reportPath, String sessionId, String runnerCopyPath) {
         Path path = Paths.get(reportPath);
         if (!path.toFile().exists()) {
             return null;

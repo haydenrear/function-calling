@@ -1,6 +1,6 @@
 package com.hayden.functioncalling.service;
 
-import com.hayden.functioncalling.service.process_builder.TestReportService;
+import com.hayden.functioncalling.context_processor.TestReportService;
 import com.hayden.utilitymodule.io.FileUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -34,11 +34,11 @@ class TestReportServiceTest {
         isTestWorkDir = FileUtils.getTestWorkDir();
         assertThat(isTestWorkDir.isPresent()).isTrue();
         Path testWorkDir = isTestWorkDir.get();
-        var failures = testReportService.getFailureContext("/Users/hayde/IdeaProjects/drools/function-calling/src/test/resources/test-reports/failure/index.html",
+        var failures = testReportService.getContext("/Users/hayde/IdeaProjects/drools/function-calling/src/test/resources/test-reports/failure/index.html",
                 "test_session",
                 testWorkDir.toFile().getAbsolutePath());
         assertThat(failures).doesNotContain("No test failures found.");
-        var successes = testReportService.getFailureContext("/Users/hayde/IdeaProjects/drools/function-calling/src/test/resources/test-reports/success/index.html",
+        var successes = testReportService.getContext("/Users/hayde/IdeaProjects/drools/function-calling/src/test/resources/test-reports/success/index.html",
                 "test_session",
                 testWorkDir.toFile().getAbsolutePath());
         assertThat(successes).contains("No test failures found.");

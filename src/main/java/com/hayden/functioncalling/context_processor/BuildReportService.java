@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Service for handling test reports
@@ -13,10 +14,8 @@ import java.nio.file.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TestReportService implements ContextProcessor {
+public class BuildReportService {
     
-    private final TestResultsProcessor testResultsProcessor;
-
 
     /**
      * Get context information for failed tests
@@ -24,14 +23,6 @@ public class TestReportService implements ContextProcessor {
      * @return Formatted failure information
      */
     public String getContext(String reportPath, String sessionId, String runnerCopyPath) {
-        Path path = Paths.get(reportPath);
-        if (!path.toFile().exists()) {
-            return null;
-        }
-
-        String absolutePath = path.toFile().getAbsolutePath();
-        var processed = testResultsProcessor.processTestFailures(absolutePath);
-        testResultsProcessor.copyTestResults(sessionId, processed, path, runnerCopyPath);
-        return processed;
+        return "";
     }
 }

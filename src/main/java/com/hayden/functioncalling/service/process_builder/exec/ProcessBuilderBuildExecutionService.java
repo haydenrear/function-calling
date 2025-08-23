@@ -128,7 +128,8 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
         }
 
         try {
-            Path outputDir = Paths.get(entity.getArtifactOutputDirectory(), buildId);
+//            Path outputDir = Paths.get(entity.getArtifactOutputDirectory(), buildId);
+            Path outputDir = Paths.get(entity.getArtifactOutputDirectory());
             Files.createDirectories(outputDir);
 
             for (String artifactPath : entity.getArtifactPaths()) {

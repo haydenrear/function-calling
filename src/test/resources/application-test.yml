@@ -6,10 +6,13 @@ spring:
       enabled: true
       file: src/test/docker/docker-compose.yml
       lifecycle-management: start_and_stop
+
       readiness:
         wait: always
       skip:
         in-tests: false
+      start:
+        skip: if_running
   jpa:
     hibernate:
       ddl-auto: create-drop

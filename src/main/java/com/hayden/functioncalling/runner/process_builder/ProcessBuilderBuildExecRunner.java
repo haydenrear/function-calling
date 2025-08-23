@@ -43,9 +43,7 @@ public class ProcessBuilderBuildExecRunner implements BuildExecRunner {
         }
 
         Optional<CodeBuildEntity> buildEntityOpt =
-            codeBuildRepository.findByRegistrationId(
-                options.getRegistrationId()
-            );
+            codeBuildRepository.findByRegistrationId(options.getRegistrationId());
 
         if (buildEntityOpt.isEmpty()) {
             return CodeBuildResult.newBuilder()

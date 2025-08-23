@@ -1,5 +1,5 @@
 spring.application.name: function-calling
-
+server.port: 8084
 spring:
   session:
     jdbc:

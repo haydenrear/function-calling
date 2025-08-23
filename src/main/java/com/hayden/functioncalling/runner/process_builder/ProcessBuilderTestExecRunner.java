@@ -4,6 +4,7 @@ import com.hayden.commitdiffmodel.codegen.types.CodeExecutionOptions;
 import com.hayden.commitdiffmodel.codegen.types.CodeExecutionResult;
 import com.hayden.commitdiffmodel.codegen.types.Error;
 import com.hayden.commitdiffmodel.codegen.types.ExecutionType;
+import com.hayden.functioncalling.context_processor.TestReportService;
 import com.hayden.functioncalling.entity.TestExecutionEntity;
 import com.hayden.functioncalling.repository.TestExecutionRepository;
 import com.hayden.functioncalling.runner.ExecRunner;
@@ -179,7 +180,7 @@ public class ProcessBuilderTestExecRunner
             .flatMap(s -> {
                 try {
                     return Stream.ofNullable(
-                        testReportService.getFailureContext(
+                        testReportService.getContext(
                             s,
                             entity.getRegistrationId(),
                             options.getSessionId()
