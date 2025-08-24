@@ -6,9 +6,7 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -111,7 +109,7 @@ public class ProcessBuilderExecutionService {
 
         return ProcessExecutionResult.builder()
                 .success(success)
-                .output(output.toString())
+                .matchedOutput(output.toString())
                 .fullLog(fullLog.toString())
                 .error(error)
                 .logPath(Optional.ofNullable(request.getOutputFile()).map(File::toPath).orElse(null))
@@ -206,7 +204,7 @@ public class ProcessBuilderExecutionService {
 
         return ProcessExecutionResult.builder()
                 .success(success)
-                .output(output.toString())
+                .matchedOutput(output.toString())
                 .fullLog(fullLog.toString())
                 .error(error)
                 .exitCode(exitCode)
@@ -261,8 +259,6 @@ public class ProcessBuilderExecutionService {
                         if (request.getOutputRegex().stream().anyMatch(finalLine::matches)) {
                             output.append(finalLine).append("\n");
                         }
-                    } else {
-                        output.append(line).append("\n");
                     }
 
                     if (request.getOutputFile() == null)

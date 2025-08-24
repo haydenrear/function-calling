@@ -118,7 +118,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
             if (!"HEALTHY".equals(healthCheckStatus)) {
                 result = result.toBuilder()
                         .success(false)
-                        .output(result.getOutput())
+                        .matchedOutput(result.getMatchedOutput())
                         .fullLog(result.getFullLog())
                         .error("Health check failed: " + healthCheckStatus)
                         .exitCode(result.getExitCode())
@@ -134,7 +134,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 deployId,
                 entity.getDeployCommand(),
                 arguments,
-                result.getOutput(),
+                result.getMatchedOutput(),
                 result.getError(),
                 result.isSuccess(),
                 result.getExitCode(),
@@ -150,7 +150,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
         return CodeDeployResult.newBuilder()
                 .registrationId(options.getRegistrationId())
                 .success(result.isSuccess())
-                .output(result.getOutput())
+                .matchedOutput(result.getMatchedOutput())
                 .sessionId(options.getSessionId())
                 .exitCode(result.getExitCode())
                 .executionTime(result.getExecutionTimeMs())
@@ -190,7 +190,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
                 deployId,
                 entity.getStopCommand(),
                 null,
-                result.getOutput(),
+                result.getMatchedOutput(),
                 result.getError(),
                 result.isSuccess(),
                 result.getExitCode(),
@@ -206,7 +206,7 @@ public class ProcessBuilderDeployExecutionService implements ExecutionService<Co
         return CodeDeployResult.newBuilder()
                 .registrationId(entity.getRegistrationId())
                 .success(result.isSuccess())
-                .output(result.getOutput())
+                .matchedOutput(result.getMatchedOutput())
                 .sessionId(sessionId)
                 .exitCode(result.getExitCode())
                 .executionTime(result.getExecutionTimeMs())

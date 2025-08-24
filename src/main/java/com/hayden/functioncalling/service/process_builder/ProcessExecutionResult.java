@@ -9,7 +9,7 @@ import java.nio.file.Path;
 @Builder(toBuilder = true)
 public class ProcessExecutionResult {
     private boolean success;
-    private String output;
+    private String matchedOutput;
     private String fullLog;
     private Path logPath;
     private String error;

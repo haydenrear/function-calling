@@ -1,6 +1,14 @@
 package com.hayden.functioncalling.service;
 
+import com.hayden.commitdiffmodel.codegen.types.CodeBuildOptions;
 import com.hayden.commitdiffmodel.codegen.types.ExecutionType;
+import com.hayden.functioncalling.entity.CodeBuildEntity;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public interface ExecutionService<T, R, O> {
 
@@ -25,5 +33,15 @@ public interface ExecutionService<T, R, O> {
      */
     default boolean canHandle(ExecutionType executionType) {
         return getExecutionType().equals(executionType);
+    }
+
+    static @Nullable File getLogFile(CodeBuildEntity entity, CodeBuildOptions options) throws IOException {
+        File file = null;
+        if (options.getWriteToFile()) {
+            file = Paths.get(entity.getArtifactOutputDirectory()).getParent().resolve("%s-log.log".formatted(entity.getRegistrationId())).toFile();
+            if (file.exists())
+                Files.delete(file.toPath());
+        }
+        return file;
     }
 }

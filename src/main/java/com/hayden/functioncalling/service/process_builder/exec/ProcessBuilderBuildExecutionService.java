@@ -68,12 +68,12 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
                 ? entity.getTimeoutSeconds()
                 : null;
 
-        // Build process execution request
         ProcessExecutionRequest request = ProcessExecutionRequest.builder()
                 .command(entity.getBuildCommand())
                 .arguments(arguments)
                 .workingDirectory(entity.getWorkingDirectory())
                 .timeoutSeconds(timeoutSeconds)
+                .outputFile(ExecutionService.getLogFile(entity, options))
                 .outputRegex(entity.getOutputRegex())
                 .successPatterns(entity.getBuildSuccessPatterns())
                 .failurePatterns(entity.getBuildFailurePatterns())
@@ -95,7 +95,7 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
                 buildId,
                 entity.getBuildCommand(),
                 arguments,
-                result.getOutput(),
+                result.getMatchedOutput(),
                 result.getError(),
                 result.isSuccess(),
                 result.getExitCode(),
@@ -108,7 +108,7 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
         return CodeBuildResult.newBuilder()
                 .registrationId(options.getRegistrationId())
                 .success(result.isSuccess())
-                .output(result.getOutput())
+                .matchedOutput(result.getMatchedOutput())
                 .sessionId(options.getSessionId())
                 .exitCode(result.getExitCode())
                 .executionTime(result.getExecutionTimeMs())

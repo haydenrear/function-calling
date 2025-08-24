@@ -192,7 +192,7 @@ public class ProcessBuilderTestExecRunner
             })
             .collect(Collectors.joining(System.lineSeparator()));
 
-        var outputStr = result.getOutput();
+        var outputStr = result.getMatchedOutput();
         if (StringUtils.isNotBlank(reporting)) {
             outputStr = reporting;
         }
@@ -214,7 +214,7 @@ public class ProcessBuilderTestExecRunner
         return CodeExecutionResult.newBuilder()
             .registrationId(options.getRegistrationId())
             .success(result.isSuccess())
-            .output(result.getOutput())
+            .output(result.getMatchedOutput())
             .sessionId(options.getSessionId())
             .exitCode(result.getExitCode())
             .executionTime(result.getExecutionTimeMs())
