@@ -7,11 +7,11 @@ spring:
       initialize-schema: always
   docker:
     compose:
-      enabled: false
+      enabled: true
       file: classpath:docker/docker-compose.yml
       lifecycle-management: start_only
       readiness:
-        wait: always
+        wait: only_if_started
       skip:
         in-tests: false
   jpa:
