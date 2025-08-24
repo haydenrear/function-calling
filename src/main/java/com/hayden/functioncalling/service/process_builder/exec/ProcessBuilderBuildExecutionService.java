@@ -136,9 +136,11 @@ public class ProcessBuilderBuildExecutionService implements ExecutionService<Cod
             for (String artifactPath : entity.getArtifactPaths()) {
                 Path sourcePath = Paths.get(artifactPath);
 
-                if (entity.getWorkingDirectory() != null) {
+                if (!sourcePath.toFile().exists() && entity.getWorkingDirectory() != null) {
                     sourcePath = Paths.get(entity.getWorkingDirectory()).resolve(artifactPath);
                 }
+
+                log.info("Found copy to path {}", sourcePath);
 
                 if (Files.exists(sourcePath)) {
                     Path targetPath = outputDir.resolve(sourcePath.getFileName());

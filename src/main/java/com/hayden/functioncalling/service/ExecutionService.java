@@ -38,7 +38,7 @@ public interface ExecutionService<T, R, O> {
     static @Nullable File getLogFile(CodeBuildEntity entity, CodeBuildOptions options) throws IOException {
         File file = null;
         if (options.getWriteToFile()) {
-            file = Paths.get(entity.getArtifactOutputDirectory()).getParent().resolve("%s-log.log".formatted(entity.getRegistrationId())).toFile();
+            file = Paths.get(entity.getArtifactOutputDirectory()).resolve("%s-log.log".formatted(entity.getRegistrationId())).toFile();
             if (file.exists())
                 Files.delete(file.toPath());
         }

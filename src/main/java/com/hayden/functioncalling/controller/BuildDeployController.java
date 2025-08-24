@@ -18,8 +18,10 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -95,7 +97,7 @@ public class BuildDeployController {
                 .sessionId(sessionId)
                 .success(history.getSuccess())
                 .matchedOutput(history.getOutput())
-                .error(List.of(new Error(history.getError())))
+                .error(parseErr(history.getError()))
                 .exitCode(history.getExitCode())
                 .buildId(buildId)
                 .executionTime(history.getExecutionTimeMs())
@@ -103,6 +105,10 @@ public class BuildDeployController {
                 .artifactOutputDirectory(history.getArtifactOutputDirectory())
                 .buildLog(history.getBuildLog())
                 .build();
+    }
+
+    private static @Nullable List<Error> parseErr(String error) {
+        return StringUtils.isNotBlank(error) ? List.of(new Error(error)) : null;
     }
 
     // Deploy Queries
@@ -154,7 +160,7 @@ public class BuildDeployController {
                 .sessionId(sessionId)
                 .success(history.getSuccess())
                 .matchedOutput(history.getOutput())
-                .error(List.of(new Error(history.getError())))
+                .error(parseErr(history.getError()))
                 .exitCode(history.getExitCode())
                 .deployId(deployId)
                 .executionTime(history.getExecutionTimeMs())
@@ -388,7 +394,7 @@ public class BuildDeployController {
                          : null)
                 .exitCode(entity.getExitCode())
                 .matchedOutput(entity.getOutput())
-                .error(List.of(new Error(entity.getError())))
+                .error(parseErr(entity.getError()))
                 .buildId(entity.getBuildId())
                 .artifactPaths(entity.getArtifactPaths())
                 .build();
@@ -421,7 +427,7 @@ public class BuildDeployController {
                          : null)
                 .exitCode(entity.getExitCode())
                 .matchedOutput(entity.getOutput())
-                .error(List.of(new Error(entity.getError())))
+                .error(parseErr(entity.getError()))
                 .deployId(entity.getDeployId())
                 .healthCheckStatus(entity.getHealthCheckStatus())
                 .isRunning(entity.getIsRunning())
