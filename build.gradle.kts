@@ -15,7 +15,7 @@ plugins {
 wrapDocker {
     ctx = arrayOf(
         DockerContext(
-            "localhost:5001/function-calling",
+            "localhost:5005/function-calling",
             "${project.projectDir}/src/main/docker",
             "functionCalling"
         )
