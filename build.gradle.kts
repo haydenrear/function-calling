@@ -5,7 +5,6 @@ plugins {
     id("com.hayden.jpa-persistence")
     id("com.hayden.spring-app")
     id("com.hayden.graphql-data-service")
-    id("com.hayden.discovery-app")
     id("com.hayden.messaging")
     id("com.hayden.ai")
     id("com.hayden.docker-compose")
@@ -84,6 +83,7 @@ dependencies {
 }
 
 tasks.generateJava {
+    dependsOn(project(":commit-diff-model").tasks.named("generateJava"))
     typeMapping = mutableMapOf(
         Pair("ServerByteArray", "com.hayden.commitdiffmodel.scalar.ByteArray"),
         Pair("Float32Array", "com.hayden.commitdiffmodel.scalar.FloatArray"),
