@@ -18,6 +18,7 @@ public class ProcessExecutionRequest {
     private List<String> successPatterns;
     private List<String> failurePatterns;
     private File outputFile;
+    private File errorFile;
     private Integer maxWaitForPatternSeconds;
 
     public Integer numWaitSeconds() {

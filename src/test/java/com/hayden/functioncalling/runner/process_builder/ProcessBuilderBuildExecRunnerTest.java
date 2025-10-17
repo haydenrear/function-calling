@@ -124,7 +124,7 @@ public class ProcessBuilderBuildExecRunnerTest {
         // Verify the result
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isTrue();
-        assertThat(result.getOutput()).contains("Build completed successfully!");
+        assertThat(result.getBuildLog()).contains("Build completed successfully!");
         assertThat(result.getExitCode()).isEqualTo(0);
         assertThat(result.getBuildId()).isNotNull();
         assertThat(result.getRegistrationId()).isEqualTo(successRegistrationId);
@@ -152,7 +152,7 @@ public class ProcessBuilderBuildExecRunnerTest {
         // Verify the result
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isFalse();
-        assertThat(result.getOutput()).contains("Build failed with errors!");
+        assertThat(result.getBuildLog()).contains("Build failed with errors!");
         assertThat(result.getExitCode()).isEqualTo(1);
         assertThat(result.getBuildId()).isNotNull();
         assertThat(result.getRegistrationId()).isEqualTo(failRegistrationId);
@@ -317,7 +317,7 @@ public class ProcessBuilderBuildExecRunnerTest {
         assertThat(result.getSuccess()).isTrue();
 
         // Verify the success pattern was matched
-        assertThat(result.getOutput()).contains("Build completed successfully!");
+        assertThat(result.getBuildLog()).contains("Build completed successfully!");
         assertThat(result.getBuildLog()).contains("Stage 1: Compiling source code");
         assertThat(result.getBuildLog()).contains("Stage 2: Running tests");
         assertThat(result.getBuildLog()).contains("Stage 3: Packaging artifacts");

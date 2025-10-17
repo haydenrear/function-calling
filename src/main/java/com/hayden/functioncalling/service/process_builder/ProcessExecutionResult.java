@@ -16,4 +16,5 @@ public class ProcessExecutionResult {
     private int exitCode;
     private int executionTimeMs;
     private Process process;
+    boolean didWriteToFile;
 }

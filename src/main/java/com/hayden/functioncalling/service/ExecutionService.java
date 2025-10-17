@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public interface ExecutionService<T, R, O> {
 
@@ -37,7 +38,7 @@ public interface ExecutionService<T, R, O> {
 
     static @Nullable File getLogFile(CodeBuildEntity entity, CodeBuildOptions options) throws IOException {
         File file = null;
-        if (options.getWriteToFile()) {
+        if (Optional.ofNullable(options).map(CodeBuildOptions::getWriteToFile).orElse(false)) {
             file = Paths.get(entity.getArtifactOutputDirectory()).resolve("%s-log.log".formatted(entity.getRegistrationId())).toFile();
             if (file.exists())
                 Files.delete(file.toPath());

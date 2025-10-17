@@ -122,7 +122,7 @@ public class ProcessBuilderDeployExecRunnerTest {
         // Verify the result
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isTrue();
-        assertThat(result.getOutput()).contains("Deployment completed successfully!");
+        assertThat(result.getDeployLog()).contains("Deployment completed successfully!");
         assertThat(result.getExitCode()).isEqualTo(0);
         assertThat(result.getDeployId()).isNotNull();
         assertThat(result.getRegistrationId()).isEqualTo(successRegistrationId);
@@ -147,7 +147,7 @@ public class ProcessBuilderDeployExecRunnerTest {
         // Verify the result
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isTrue();
-        assertThat(result.getOutput()).contains("Deployment completed successfully!");
+        assertThat(result.getDeployLog()).contains("Deployment completed successfully!");
         assertThat(result.getExitCode()).isEqualTo(0);
         assertThat(result.getDeployId()).isNotNull();
         assertThat(result.getRegistrationId()).isEqualTo(noHealthRegistrationId);
@@ -311,7 +311,7 @@ public class ProcessBuilderDeployExecRunnerTest {
         assertThat(result.getSuccess()).isTrue();
 
         // Verify the success pattern was matched
-        assertThat(result.getOutput()).contains("Deployment completed successfully!");
+        assertThat(result.getDeployLog()).contains("Deployment completed successfully!");
         assertThat(result.getDeployLog()).contains("Stage 1: Preparing deployment environment");
         assertThat(result.getDeployLog()).contains("Stage 2: Deploying application");
         assertThat(result.getDeployLog()).contains("Stage 3: Running health checks");
@@ -340,7 +340,7 @@ public class ProcessBuilderDeployExecRunnerTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getSuccess()).isTrue();
-        assertThat(result.getOutput()).contains("Deployment stopped successfully!");
+        assertThat(result.getDeployLog()).contains("Deployment stopped successfully!");
         assertThat(result.getExitCode()).isEqualTo(0);
         assertThat(result.getDeployId()).isNotNull();
         assertThat(result.getRegistrationId()).isEqualTo(registrationId);

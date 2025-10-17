@@ -10,7 +10,6 @@ public interface BuildExecRunner {
 
     CodeBuildResult build(CodeBuildOptions codeBuildOptions);
 
-    @Async
     CompletableFuture<CodeBuildResult> buildAsync(CodeBuildOptions codeBuildOptions);
 
 }

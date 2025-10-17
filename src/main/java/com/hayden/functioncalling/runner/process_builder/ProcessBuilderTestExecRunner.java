@@ -29,13 +29,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ProcessBuilderTestExecRunner
-    implements
-        ExecRunner,
-        ExecutionService<
-                TestExecutionEntity,
-            CodeExecutionResult,
-            CodeExecutionOptions
-        > {
+    implements ExecRunner, ExecutionService<TestExecutionEntity, CodeExecutionResult, CodeExecutionOptions> {
 
     private final TestExecutionRepository testExecutionRepository;
     private final ProcessBuilderDataService executionDataService;
@@ -171,21 +165,14 @@ public class ProcessBuilderTestExecRunner
             .build();
 
         // Execute using ProcessBuilderService
-        ProcessExecutionResult result = processBuilderService.executeProcess(
-            request
-        );
+        ProcessExecutionResult result = processBuilderService.executeProcess(request);
 
         // Get test reporting if configured
         var reporting = StreamUtil.toStream(entity.getReportingPaths())
             .flatMap(s -> {
                 try {
                     return Stream.ofNullable(
-                        testReportService.getContext(
-                            s,
-                            entity.getRegistrationId(),
-                            options.getSessionId()
-                        )
-                    );
+                        testReportService.getContext(s, entity.getRegistrationId(), options.getSessionId()));
                 } catch (RuntimeException e) {
                     return Stream.empty();
                 }
@@ -193,8 +180,11 @@ public class ProcessBuilderTestExecRunner
             .collect(Collectors.joining(System.lineSeparator()));
 
         var outputStr = result.getMatchedOutput();
+
         if (StringUtils.isNotBlank(reporting)) {
             outputStr = reporting;
+        } else if (StringUtils.isBlank(outputStr) && !result.isDidWriteToFile()) {
+            outputStr = result.getFullLog();
         }
 
         // Save execution history
@@ -214,7 +204,7 @@ public class ProcessBuilderTestExecRunner
         return CodeExecutionResult.newBuilder()
             .registrationId(options.getRegistrationId())
             .success(result.isSuccess())
-            .output(result.getMatchedOutput())
+            .output(outputStr)
             .sessionId(options.getSessionId())
             .exitCode(result.getExitCode())
             .executionTime(result.getExecutionTimeMs())

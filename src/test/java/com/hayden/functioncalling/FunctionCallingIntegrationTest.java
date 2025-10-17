@@ -56,7 +56,6 @@ public class FunctionCallingIntegrationTest {
     }
     
     @Test
-
     public void testCompleteExecutionFlow() throws Exception {
         // 1. Register a command
         String registrationId = UUID.randomUUID().toString();

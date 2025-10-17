@@ -10,7 +10,6 @@ public interface DeployExecRunner {
 
     CodeDeployResult deploy(CodeDeployOptions codeDeployOptions);
 
-    @Async
     CompletableFuture<CodeDeployResult> deployAsync(CodeDeployOptions codeDeployOptions);
 
     CodeDeployResult stopDeployment(String registrationId, String sessionId);

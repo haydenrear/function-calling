@@ -11,7 +11,6 @@ public interface ExecRunner {
 
     CodeExecutionResult run(CodeExecutionOptions codeExecutionResult);
 
-    @Async
     CompletableFuture<CodeExecutionResult> runAsync(CodeExecutionOptions codeExecutionResult);
 
 }

@@ -16,7 +16,7 @@ spring:
         in-tests: false
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
       format_sql: true
     show-sql: true
     database: postgresql
