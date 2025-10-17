@@ -58,7 +58,7 @@ if (enableDocker && buildCommitDiffContext) {
 
     tasks.register("buildDocker") {
         inputs.dir(file(p).resolve("src/main/docker"))
-        dependsOn("bootJar", "copyJar", "functionCallingDockerImage", "pushImages")
+        dependsOn("bootJar", "copyJar", "functionCallingDockerImage")
         doLast {
             delete(fileTree(Paths.get(p.toString(), "src/main/docker")) {
                 include("**/*.jar")
