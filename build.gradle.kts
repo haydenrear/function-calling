@@ -11,24 +11,28 @@ plugins {
     id("com.hayden.docker")
 }
 
-wrapDocker {
-    ctx = arrayOf(
-        DockerContext(
-            "localhost:5005/function-calling",
-            "${project.projectDir}/src/main/docker",
-            "functionCalling"
-        )
+val enableDocker = project.property("enable-docker")?.toString()?.toBoolean()?.or(false) ?: false
+val buildCommitDiffContext = project.property("build-function-calling")?.toString()?.toBoolean()?.or(false) ?: false
+
+var arrayOf = arrayOf(
+    DockerContext(
+        "localhost:5005/function-calling",
+        "${project.projectDir}/src/main/docker",
+        "functionCalling"
     )
+)
+
+if (!enableDocker || !buildCommitDiffContext)
+    arrayOf = emptyArray<DockerContext>()
+
+wrapDocker {
+    ctx = arrayOf
 }
 
 tasks.bootJar {
     archiveFileName = "function-calling.jar"
     enabled = true
 }
-
-val enableDocker = project.property("enable-docker")?.toString()?.toBoolean()?.or(false) ?: false
-
-val buildCommitDiffContext = project.property("build-function-calling")?.toString()?.toBoolean()?.or(false) ?: false
 
 var p = layout.projectDirectory
 
