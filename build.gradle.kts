@@ -32,27 +32,12 @@ val buildCommitDiffContext = project.property("build-function-calling")?.toStrin
 
 var p = layout.projectDirectory
 
-tasks.register("copyJar") {
-    inputs.dir(file(p).resolve("src/main/docker"))
-    dependsOn("bootJar")
-    delete {
-        fileTree(Paths.get(p.toString(),"src/main/docker")) {
-            include("**/*.jar")
-        }
-    }
-    copy {
-        from(Paths.get(p.toString(), "build/libs"))
-        into(Paths.get(p.toString(),"src/main/docker"))
-        include("function-calling.jar")
-    }
-}
-
 if (enableDocker && buildCommitDiffContext) {
     tasks.getByPath("bootJar").finalizedBy("buildDocker")
 
     tasks.getByPath("bootJar").doLast {
-        tasks.getByPath("functionCallingDockerImage").dependsOn("copyJar")
-        tasks.getByPath("pushImages").dependsOn("copyJar")
+        tasks.getByPath("functionCallingDockerImage")
+            .dependsOn(project(":runner_code").tasks.getByName("runnerTask"), "copyJar")
     }
 
     tasks.register("buildDocker") {
@@ -75,6 +60,7 @@ dependencies {
     implementation("org.modelmapper:modelmapper:3.0.0")
     implementation(project(":proto"))
     implementation(project(":utilitymodule"))
+    implementation(project(":runner_code"))
     implementation(project(":tracing"))
     implementation(project(":commit-diff-model"))
     implementation(project(":commit-diff-context"))
