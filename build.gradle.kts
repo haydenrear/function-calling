@@ -71,11 +71,3 @@ dependencies {
     implementation(project(":jpa-persistence"))
     implementation("org.jsoup:jsoup:1.15.3")
 }
-
-tasks.generateJava {
-    dependsOn(project(":commit-diff-model").tasks.named("generateJava"))
-    typeMapping = mutableMapOf(
-        Pair("ServerByteArray", "com.hayden.commitdiffmodel.scalar.ByteArray"),
-        Pair("Float32Array", "com.hayden.commitdiffmodel.scalar.FloatArray"),
-    )
-}
