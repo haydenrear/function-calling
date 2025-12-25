@@ -1,6 +1,9 @@
 package com.hayden.functioncalling.controller;
 
 import com.google.common.collect.Lists;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import com.hayden.commitdiffcontext.convert.CommitDiffContextMapper;
 import com.hayden.commitdiffmodel.codegen.types.*;
 import com.hayden.commitdiffmodel.codegen.types.Error;
@@ -15,9 +18,6 @@ import com.hayden.functioncalling.repository.CodeDeployRepository;
 import com.hayden.functioncalling.runner.BuildExecRunner;
 import com.hayden.functioncalling.runner.DeployExecRunner;
 import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsMutation;
-import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.InputArgument;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class BuildDeployController {
     private final CommitDiffContextMapper mapper;
 
     // Build Queries
-    @DgsQuery
+    @QueryMapping
     public List<CodeBuildRegistration> retrieveBuildRegistrations() {
         List<CodeBuildEntity> entities = buildRepository.findAll();
         return entities.stream()
@@ -52,7 +52,7 @@ public class BuildDeployController {
                 .collect(Collectors.toList());
     }
 
-    @DgsQuery
+    @QueryMapping
     public List<CodeBuild> retrieveBuilds() {
         List<CodeBuildHistory> entities = buildHistoryRepository.findTop10ByOrderByCreatedTimeDesc();
         return entities.stream()
@@ -60,8 +60,8 @@ public class BuildDeployController {
                 .collect(Collectors.toList());
     }
 
-    @DgsQuery
-    public CodeBuildRegistration getCodeBuildRegistration(@InputArgument String registrationId) {
+    @QueryMapping
+    public CodeBuildRegistration getCodeBuildRegistration(@Argument String registrationId) {
         Optional<CodeBuildEntity> entity = buildRepository.findByRegistrationId(registrationId);
         return entity.map(this::mapToBuildRegistration)
                 .orElse(
@@ -71,8 +71,8 @@ public class BuildDeployController {
                                 .build());
     }
 
-    @DgsQuery
-    public CodeBuildResult getBuildOutput(@InputArgument String buildId, @InputArgument String sessionId) {
+    @QueryMapping
+    public CodeBuildResult getBuildOutput(@Argument String buildId, @Argument String sessionId) {
         if (buildId == null || buildId.isBlank()) {
             return CodeBuildResult.newBuilder()
                     .success(false)
@@ -112,7 +112,7 @@ public class BuildDeployController {
     }
 
     // Deploy Queries
-    @DgsQuery
+    @QueryMapping
     public List<CodeDeployRegistration> retrieveDeployRegistrations() {
         List<CodeDeployEntity> entities = deployRepository.findAll();
         return entities.stream()
@@ -120,7 +120,7 @@ public class BuildDeployController {
                 .collect(Collectors.toList());
     }
 
-    @DgsQuery
+    @QueryMapping
     public List<CodeDeploy> retrieveDeploys() {
         List<CodeDeployHistory> entities = deployHistoryRepository.findTop10ByOrderByCreatedTimeDesc();
         return entities.stream()
@@ -128,14 +128,14 @@ public class BuildDeployController {
                 .collect(Collectors.toList());
     }
 
-    @DgsQuery
-    public CodeDeployRegistration getCodeDeployRegistration(@InputArgument String registrationId) {
+    @QueryMapping
+    public CodeDeployRegistration getCodeDeployRegistration(@Argument String registrationId) {
         Optional<CodeDeployEntity> entity = deployRepository.findByRegistrationId(registrationId);
         return entity.map(this::mapToDeployRegistration).orElse(null);
     }
 
-    @DgsQuery
-    public CodeDeployResult getDeployOutput(@InputArgument String deployId, @InputArgument String sessionId) {
+    @QueryMapping
+    public CodeDeployResult getDeployOutput(@Argument String deployId, @Argument String sessionId) {
         if (deployId == null || deployId.isBlank()) {
             return CodeDeployResult.newBuilder()
                     .success(false)
@@ -172,7 +172,7 @@ public class BuildDeployController {
                 .build();
     }
 
-    @DgsQuery
+    @QueryMapping
     public List<CodeDeploy> getRunningDeployments() {
         List<CodeDeployHistory> entities = deployHistoryRepository.findByIsRunningTrue();
         return entities.stream()
@@ -181,8 +181,8 @@ public class BuildDeployController {
     }
 
     // Build Mutations
-    @DgsMutation
-    public CodeBuildRegistration registerCodeBuild(@InputArgument CodeBuildRegistrationIn codeBuildRegistration) {
+    @MutationMapping
+    public CodeBuildRegistration registerCodeBuild(@Argument CodeBuildRegistrationIn codeBuildRegistration) {
         CodeBuildEntity entity = mapper.map(codeBuildRegistration, CodeBuildEntity.class);
 
         buildRepository.deleteById(entity.getRegistrationId());
@@ -193,15 +193,15 @@ public class BuildDeployController {
         return mapToBuildRegistration(entity);
     }
 
-    @DgsMutation
+    @MutationMapping
     public CodeBuildRegistration updateCodeBuildRegistration(
-            @InputArgument String registrationId,
-            @InputArgument Boolean enabled,
-            @InputArgument String buildCommand,
-            @InputArgument String workingDirectory,
-            @InputArgument String arguments,
-            @InputArgument Integer timeoutSeconds,
-            @InputArgument String sessionId) {
+            @Argument String registrationId,
+            @Argument Boolean enabled,
+            @Argument String buildCommand,
+            @Argument String workingDirectory,
+            @Argument String arguments,
+            @Argument Integer timeoutSeconds,
+            @Argument String sessionId) {
 
         Optional<CodeBuildEntity> entityOpt = buildRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
@@ -238,8 +238,8 @@ public class BuildDeployController {
         return mapToBuildRegistration(entity);
     }
 
-    @DgsMutation
-    public Boolean deleteCodeBuildRegistration(@InputArgument String registrationId, @InputArgument String sessionId) {
+    @MutationMapping
+    public Boolean deleteCodeBuildRegistration(@Argument String registrationId, @Argument String sessionId) {
         Optional<CodeBuildEntity> entityOpt = buildRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
             log.warn("Cannot delete - no code build registration found with ID: {}", registrationId);
@@ -252,8 +252,8 @@ public class BuildDeployController {
         return true;
     }
 
-    @DgsMutation
-    public CodeBuildResult build(@InputArgument CodeBuildOptions options) {
+    @MutationMapping
+    public CodeBuildResult build(@Argument CodeBuildOptions options) {
         log.info("Executing build with options: {}", options);
 
         if (options == null || options.getRegistrationId() == null) {
@@ -267,8 +267,8 @@ public class BuildDeployController {
         return buildExecRunner.build(options);
     }
 
-    @DgsMutation
-    public CodeDeployRegistration registerCodeDeploy(@InputArgument CodeDeployRegistrationIn codeDeployRegistration) {
+    @MutationMapping
+    public CodeDeployRegistration registerCodeDeploy(@Argument CodeDeployRegistrationIn codeDeployRegistration) {
         CodeDeployEntity entity = mapper.map(codeDeployRegistration, CodeDeployEntity.class);
 
         entity = deployRepository.save(entity);
@@ -277,15 +277,15 @@ public class BuildDeployController {
         return mapToDeployRegistration(entity);
     }
 
-    @DgsMutation
+    @MutationMapping
     public CodeDeployRegistration updateCodeDeployRegistration(
-            @InputArgument String registrationId,
-            @InputArgument Boolean enabled,
-            @InputArgument String deployCommand,
-            @InputArgument String workingDirectory,
-            @InputArgument String arguments,
-            @InputArgument Integer timeoutSeconds,
-            @InputArgument String sessionId) {
+            @Argument String registrationId,
+            @Argument Boolean enabled,
+            @Argument String deployCommand,
+            @Argument String workingDirectory,
+            @Argument String arguments,
+            @Argument Integer timeoutSeconds,
+            @Argument String sessionId) {
 
         Optional<CodeDeployEntity> entityOpt = deployRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
@@ -322,8 +322,8 @@ public class BuildDeployController {
         return mapToDeployRegistration(entity);
     }
 
-    @DgsMutation
-    public Boolean deleteCodeDeployRegistration(@InputArgument String registrationId, @InputArgument String sessionId) {
+    @MutationMapping
+    public Boolean deleteCodeDeployRegistration(@Argument String registrationId, @Argument String sessionId) {
         Optional<CodeDeployEntity> entityOpt = deployRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
             log.warn("Cannot delete - no code deploy registration found with ID: {}", registrationId);
@@ -336,8 +336,8 @@ public class BuildDeployController {
         return true;
     }
 
-    @DgsMutation
-    public CodeDeployResult deploy(@InputArgument CodeDeployOptions options) {
+    @MutationMapping
+    public CodeDeployResult deploy(@Argument CodeDeployOptions options) {
         log.info("Executing deploy with options: {}", options);
 
         if (options == null || options.getRegistrationId() == null) {
@@ -351,8 +351,8 @@ public class BuildDeployController {
         return deployExecRunner.deploy(options);
     }
 
-    @DgsMutation
-    public CodeDeployResult stopDeployment(@InputArgument String registrationId, @InputArgument String sessionId) {
+    @MutationMapping
+    public CodeDeployResult stopDeployment(@Argument String registrationId, @Argument String sessionId) {
         log.info("Stopping deployment: {}", registrationId);
 
         if (registrationId == null || registrationId.isBlank()) {

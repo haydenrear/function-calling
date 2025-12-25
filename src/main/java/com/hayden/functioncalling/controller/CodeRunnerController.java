@@ -9,9 +9,6 @@ import com.hayden.functioncalling.repository.TestExecutionHistoryRepository;
 import com.hayden.functioncalling.repository.TestExecutionRepository;
 import com.hayden.functioncalling.runner.ExecRunner;
 import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsMutation;
-import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +16,10 @@ import java.time.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 
 @DgsComponent
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class CodeRunnerController {
     private final ExecRunner execRunner;
     private final CommitDiffContextMapper mapper;
 
-    @DgsQuery
+    @QueryMapping
     public List<CodeExecutionRegistration> retrieveRegistrations() {
         List<TestExecutionEntity> entities = executionRepository.findAll();
         return entities.stream()
@@ -38,7 +39,7 @@ public class CodeRunnerController {
                 .collect(Collectors.toList());
     }
     
-    @DgsQuery
+    @QueryMapping
     public List<CodeExecution> retrieveExecutions() {
         List<TestExecutionHistory> entities = executionHistoryRepository.findTop10ByOrderByCreatedTimeDesc();
         return entities.stream()
@@ -46,15 +47,15 @@ public class CodeRunnerController {
                 .collect(Collectors.toList());
     }
 
-    @DgsQuery
-    public CodeExecutionRegistration getCodeExecutionRegistration(@InputArgument String registrationId) {
+    @QueryMapping
+    public CodeExecutionRegistration getCodeExecutionRegistration(@Argument String registrationId) {
         Optional<TestExecutionEntity> entity = executionRepository.findByRegistrationId(registrationId);
         return entity.map(this::mapToRegistration).orElse(null);
     }
 
-    @DgsMutation
+    @MutationMapping
     public CodeExecutionRegistration registerCodeExecution(
-            @InputArgument CodeExecutionRegistrationIn codeExecutionRegistration) {
+            @Argument CodeExecutionRegistrationIn codeExecutionRegistration) {
         TestExecutionEntity entity = mapper.map(codeExecutionRegistration, TestExecutionEntity.class);
         entity.setExecutionType(Optional.ofNullable(entity.getExecutionType()).orElse(ExecutionType.PROCESS_BUILDER));
         
@@ -64,16 +65,16 @@ public class CodeRunnerController {
         return mapToRegistration(entity);
     }
 
-    @DgsMutation
+    @MutationMapping
     
     public CodeExecutionRegistration updateCodeExecutionRegistration(
-            @InputArgument String registrationId,
-            @InputArgument Boolean enabled,
-            @InputArgument String command,
-            @InputArgument String workingDirectory,
-            @InputArgument String arguments,
-            @InputArgument Integer timeoutSeconds,
-            @InputArgument String sessionId) {
+            @Argument String registrationId,
+            @Argument Boolean enabled,
+            @Argument String command,
+            @Argument String workingDirectory,
+            @Argument String arguments,
+            @Argument Integer timeoutSeconds,
+            @Argument String sessionId) {
         
         Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
@@ -112,9 +113,9 @@ public class CodeRunnerController {
         return mapToRegistration(entity);
     }
 
-    @DgsMutation
+    @MutationMapping
     
-    public Boolean deleteCodeExecutionRegistration(@InputArgument String registrationId, @InputArgument String sessionId) {
+    public Boolean deleteCodeExecutionRegistration(@Argument String registrationId, @Argument String sessionId) {
         Optional<TestExecutionEntity> entityOpt = executionRepository.findByRegistrationId(registrationId);
         if (entityOpt.isEmpty()) {
             log.warn("Cannot delete - no code execution registration found with ID: {}", registrationId);
@@ -127,8 +128,8 @@ public class CodeRunnerController {
         return true;
     }
 
-    @DgsMutation
-    public CodeExecutionResult execute(@InputArgument CodeExecutionOptions options) {
+    @MutationMapping
+    public CodeExecutionResult execute(@Argument CodeExecutionOptions options) {
         log.info("Executing code with options: {}", options);
         
         if (options == null || options.getRegistrationId() == null) {
@@ -142,8 +143,8 @@ public class CodeRunnerController {
         return execRunner.run(options);
     }
     
-    @DgsMutation
-    public CodeExecutionResult executeWithOutputFile(@InputArgument CodeExecutionOptions options, @InputArgument String outputFilePath) {
+    @MutationMapping
+    public CodeExecutionResult executeWithOutputFile(@Argument CodeExecutionOptions options, @Argument String outputFilePath) {
         log.info("Executing code with output file. Options: {}, File: {}", options, outputFilePath);
         
         if (options == null || options.getRegistrationId() == null) {
@@ -203,8 +204,8 @@ public class CodeRunnerController {
         return LocalDate.ofInstant(Instant.ofEpochMilli(localDateTime), ZoneId.systemDefault()) ;
     }
 
-    @DgsQuery
-    public CodeExecutionResult getExecutionOutput(@InputArgument String executionId, @InputArgument String sessionId) {
+    @QueryMapping
+    public CodeExecutionResult getExecutionOutput(@Argument String executionId, @Argument String sessionId) {
         if (executionId == null || executionId.isBlank()) {
             return CodeExecutionResult.newBuilder()
                     .success(false)
